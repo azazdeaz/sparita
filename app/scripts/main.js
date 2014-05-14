@@ -7,8 +7,7 @@
 
 'use strict';
 
-var App = require('./app.js');
+var pager = require('./pager.js'),
+	$ = require('jquery');
 
-var app = new App();
-
-app.beep();
+pager.open('menu');

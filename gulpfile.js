@@ -53,12 +53,13 @@ gulp.task('scripts', function () {
     .pipe($.browserify({
       debug: true,
       transform: [
+      	'brfs',
         'debowerify'
       ],
       // Note: At this time it seems that you will also have to 
       // setup browserify-shims in package.json to correctly handle
       // the exclusion of vendor vendor libraries from your bundle
-      external: ['lodash'],
+      external: ['lodash', 'jquery'],
       extensions: ['.js']
     }))
     // .pipe($.uglify())
@@ -123,6 +124,17 @@ gulp.task('connect', $.connect.server({
     browser: 'Google Chrome'
   },
 }));
+
+gulp.task('connect-testerest', $.connect.server({
+  root: __dirname + '/testerest',
+  port: 9001,
+  open: {
+    file: 'index.html',
+    browser: 'Google Chrome'
+  },
+}));
+
+
 
 // Watch
 gulp.task('watch', ['connect'], function () {
