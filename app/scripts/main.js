@@ -9,5 +9,10 @@
 
 var pager = require('./pager.js'),
 	$ = require('jquery');
+	// foundation = require('foundation');
 
 pager.open('menu');
+
+$('nav #menu').click(pager.open.bind(null, 'menu'));
+
+// $(document).foundation();

@@ -2,12 +2,18 @@
 
 var fs = require('fs'),
 	$ = require('jquery'),
-	pager = require('./pager.js');
+	pager = require('./pager');
 
 var menu = {
 	$root: $(fs.readFileSync('app/templates/menu.html', 'utf8'))
-}
-console.log("menu.$root.find('btn-levels')", menu.$root.find('btn-levels'))
-menu.$root.find('#btn-levels').click(function () {pager.open('levels')});
+};
+
+menu.$root.find('#btn-levels').click(function () {
+	pager.open('levels');
+});
+
+menu.$root.find('#btn-challenge').click(function () {
+	pager.open('challenge');
+});
 
 module.exports = menu;

@@ -53,13 +53,26 @@ gulp.task('scripts', function () {
     .pipe($.browserify({
       debug: true,
       transform: [
-      	'brfs',
+        'brfs',
         'debowerify'
       ],
+      shim: {
+          jquery: {
+              path: 'app/bower_components/jquery/dist/jquery.js',
+              exports: $
+          },
+          foundation: {
+              path: 'app/bower_components/foundation/js/foundation.js',
+              exports: null,
+              depends: {
+                  jquery: 'jQuery',
+              }
+          }
+      },
       // Note: At this time it seems that you will also have to 
       // setup browserify-shims in package.json to correctly handle
       // the exclusion of vendor vendor libraries from your bundle
-      external: ['lodash', 'jquery'],
+      external: ['lodash', 'jquery', 'foundation'],
       extensions: ['.js']
     }))
     // .pipe($.uglify())
@@ -72,14 +85,15 @@ gulp.task('scripts', function () {
 gulp.task('html', function () {
   return gulp.src('app/*.html')
     .pipe(gulp.dest('dist'))
-    .pipe($.size());
+    .pipe($.size())
+    .pipe($.connect.reload());
 });
 
 // Lint
 gulp.task('lint', function () {
   return gulp.src('app/scripts/**/*.js')
     .pipe($.jshint('.jshintrc'))
-    .pipe($.jshint.reporter(require('jshint-stylish')))
+    .pipe($.jshint.reporter(require('jshint-stylish')));
 });
 
 // Images
