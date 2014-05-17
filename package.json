@@ -34,14 +34,11 @@
     ]
   },
   "browser": {
-    "lodash": "./app/bower_components/lodash/dist/lodash.js",
-    "jquery": "./app/bower_components/jquery/dist/jquery.js",
-    "foundation": "./app/bower_components/foundation/js/foundation.js'"
   },
   "browserify-shim": {
     "lodash": "global:lodash",
-    "jquery": "global:$",
-    "foundation": "global:foundation"
+    "jquery": "global:jQuery",
+    "foundation": "global:jQuery.fn.foundation"
   },
   "dependencies": {}
 }

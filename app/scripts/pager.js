@@ -16,6 +16,7 @@ module.exports = {
 
 		$pageCont.children().hide();
 		$pageCont.append( pages[pageId]().$root.show() );
+		$(document).foundation();
 	}
 };
 

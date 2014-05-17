@@ -25,24 +25,24 @@ gulp.task('styles', function () {
 // Vendor
 gulp.task('vendor', function () {
   return gulp.src([
-    bower + '/angular/angular.js',
-    bower + '/angular-route/angular-route.js',
-    bower + '/lodash/dist/lodash.js'
+      // bower + '/lodash/dist/lodash.js',
+      bower + '/jquery/dist/jquery.js',
+      bower + '/foundation/js/foundation.js'
     ])
-    .pipe($.browserify({
-      debug: true,
-      transform: [
-        'debowerify'
-      ],
-      shim: {
-        lodash: {
-          path: bower + '/lodash/dist/lodash.js',
-          exports: 'lodash'
-        }
-      }
-    }))
+    // .pipe($.browserify({
+    //   debug: true,
+    //   transform: [
+    //     'debowerify'
+    //   ],
+    //   shim: {
+    //     lodash: {
+    //       path: bower + '/lodash/dist/lodash.js',
+    //       exports: 'lodash'
+    //     }
+    //   }
+    // }))
     .pipe($.concat('vendor.js'))
-    .pipe($.uglify())
+    // .pipe($.uglify())
     .pipe(gulp.dest('dist/scripts'))
     .pipe($.size());
 });
@@ -53,26 +53,27 @@ gulp.task('scripts', function () {
     .pipe($.browserify({
       debug: true,
       transform: [
+        'browserify-shim',
         'brfs',
-        'debowerify'
+        // 'debowerify'
       ],
-      shim: {
-          jquery: {
-              path: 'app/bower_components/jquery/dist/jquery.js',
-              exports: $
-          },
-          foundation: {
-              path: 'app/bower_components/foundation/js/foundation.js',
-              exports: null,
-              depends: {
-                  jquery: 'jQuery',
-              }
-          }
-      },
+      // shim: {
+      //     jquery: {
+      //       path: 'app/bower_components/jquery/dist/jquery.js',
+      //       exports: $
+      //     },
+      //     foundation: {
+      //       path: 'app/bower_components/foundation/js/foundation.js',
+      //       exports: null,
+      //       depends: {
+      //           jquery: 'jQuery',
+      //       }
+      //     }
+      // },
       // Note: At this time it seems that you will also have to 
       // setup browserify-shims in package.json to correctly handle
       // the exclusion of vendor vendor libraries from your bundle
-      external: ['lodash', 'jquery', 'foundation'],
+      // external: ['lodash', 'jQuery', 'foundation'],
       extensions: ['.js']
     }))
     // .pipe($.uglify())
@@ -122,7 +123,7 @@ gulp.task('build', ['html', 'styles', 'scripts', 'images']);
 gulp.task('dev', ['html', 'styles', 'scripts', 'images', 'connect', 'watch']);
 
 // Default task
-gulp.task('default', ['clean'], function () {
+gulp.task('default', ['clean', 'vendor'], function () {
     gulp.start('dev');
 });
 
@@ -164,7 +165,7 @@ gulp.task('watch', ['connect'], function () {
     
 
     // Watch .js files
-    gulp.watch('app/scripts/**/*.js', ['scripts']);
+    gulp.watch(['app/templates/**/*.html', 'app/scripts/**/*.js'], ['scripts']);
 
     // Watch image files
     gulp.watch('app/images/**/*', ['images']);
