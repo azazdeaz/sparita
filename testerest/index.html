@@ -12,9 +12,12 @@
             user-select: none;  
         }
     </style>
+    <script>
+      window.TweenMax = {to:function () {}}
+    </script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.11.3/TweenMax.min.js"></script>
     <script src="vendor/lodash.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="vendor/jquery.js"></script>
     <script src="utils.js"></script>
     <script data-main="main.js" src="goo/goo-require.js"></script>
 

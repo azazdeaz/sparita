@@ -16,7 +16,7 @@ function markHidden(tri, line) {
         lis2 = checkLineIntersection(tri[2], tri[0], line[0], line[1]),
         edgeA = (lis0.onLine0 && lis0) || (lis1.onLine0 && lis1) || (lis2.onLine0 && lis2), 
         edgeB = (lis1.onLine0 && lis1 !== edgeA && lis1) || (lis2.onLine0 && lis2 !== edgeA && lis2),
-        dashed = [], cpos, oea, oeb;
+        dashed = [], cpos, oea, oeb, zDiffA, zDiffB;
 
     if (edgeA && !edgeB) {
 
@@ -46,8 +46,10 @@ function markHidden(tri, line) {
     edgeB.isZ0 = zInPoint(edgeB.line0, edgeB.x, edgeB.y);
     edgeB.isZ1 = zInPoint(line, edgeB.x, edgeB.y);
 
-    edgeA.hide = edgeA.isZ1 <= edgeA.isZ0;
-    edgeB.hide = edgeB.isZ1 <= edgeB.isZ0;
+    zDiffA = edgeA.isZ1 - edgeA.isZ0;
+    zDiffB = edgeB.isZ1 - edgeB.isZ0;
+    edgeA.hide = zDiffA < 0 ? true : (zDiffA > 0 ? false : (zDiffB < 0 ? true :  false));
+    edgeB.hide = zDiffB < 0 ? true : (zDiffB > 0 ? false : (zDiffA < 0 ? true :  false));
 
     if (edgeA.hide && edgeB.hide) {//if the lines vector is intersect the triangle
 
@@ -72,6 +74,11 @@ function markHidden(tri, line) {
     
     dashed[0] = Math.min(1, Math.max(0, dashed[0]));
     dashed[1] = Math.min(1, Math.max(0, dashed[1]));
+
+    if (dashed[0] === dashed[1]) {
+
+        return;
+    }
 
     return dashed;
 }
@@ -141,7 +148,7 @@ function checkLineIntersection(line0Start, line0End, line1Start, line1End) {
 };
 
 var epsEqu = function () { // IIFE, keeps EPSILON private
-    var EPSILON = Math.pow(2, -53);
+    var EPSILON = Math.pow(2, -23/*-53*/);
     return function epsEqu(x, y) {
         return Math.abs(x - y) < EPSILON;
     };

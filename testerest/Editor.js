@@ -685,7 +685,7 @@ define([
 
                     lineVidxList.forEach(function (vidxList, lidx) {
 
-                        var line, i, sx, sy, sz, dx, dy, dz, div = 1;
+                        var line, lp, i, sx, sy, sz, dx, dy, dz, div = 1;
 
                         eBlock.lineList[lidx] = line = [
                             eBlock.vertexList[vidxList[0]],
@@ -707,10 +707,13 @@ define([
                             
                             for (i = 0; i < div; ++i) {
 
-                                line.partList.push([
+                                lp = [
                                     [sx + (dx/div)*i, sy + (dy/div)*i, sz + (dz/div)*i],
                                     [sx + (dx/div)*(i+1), sy + (dy/div)*(i+1), sz + (dz/div)*(i+1)]
-                                ]);
+                                ];
+                                lp.dasheds = [];
+
+                                line.partList.push(lp)
                             }
                         }
 
@@ -729,6 +732,60 @@ define([
             });
         });
 
+        
+
+        //mark lineparts hidden by an edge
+        eMap.forEach(function (eMapY, x) {
+            eMapY.forEach(function (eMapZ, y) {
+                eMapZ.forEach(function (aBlock, az) {
+
+                    aBlock.lineList.forEach(function (aLine3d) {
+
+                        for (var ai = 0; ai < aLine3d.partList.length; ++ai) {
+
+                            var aLp3d = aLine3d.partList[ai];
+
+                            eMapZ.forEach(function (bBlock, bz) {
+
+                                bBlock.lineList.forEach(function (bLine3d) {
+
+                                    if (aLine3d === bLine3d) {
+                                        return;
+                                    }
+
+                                    for (var bi = 0; bi < bLine3d.partList.length; ++bi) {
+
+                                        var bLp3d = bLine3d.partList[bi];
+
+                                        if (
+                                           (aLp3d[0][0] === bLp3d[0][0] &&
+                                            aLp3d[0][1] === bLp3d[0][1] &&
+                                            aLp3d[1][0] === bLp3d[1][0] &&
+                                            aLp3d[1][1] === bLp3d[1][1])
+                                           ||
+                                           (aLp3d[0][0] === bLp3d[1][0] &&
+                                            aLp3d[0][1] === bLp3d[1][1] &&
+                                            aLp3d[1][0] === bLp3d[0][0] &&
+                                            aLp3d[1][1] === bLp3d[0][1]))
+                                        {
+                                            var azVal0 = aLp3d[0][2] + (az * oMap.blockDiv.z),
+                                                azVal1 = aLp3d[1][2] + (az * oMap.blockDiv.z),
+                                                bzVal0 = aLp3d[0][2] + (bz * oMap.blockDiv.z),
+                                                bzVal1 = aLp3d[1][2] + (bz * oMap.blockDiv.z);
+
+                                            if (azVal0 > bzVal0 || azVal1 > bzVal1) {
+                                                bLp3d.dasheds.push([0, 1]);
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+        });
+
 
         //"merge" cubes (by remove matching lineparts)
         eMap.forEach(function (eMapY, x) {
@@ -736,7 +793,7 @@ define([
                 eMapZ.forEach(function (aBlock, z) {
 
                     var bBlock;
-                    // console.log('x', x, 'y', y, 'z', z);
+
                     if (eMap[x+1]) {
 
                         bBlock = eMap[x+1][y][z];
@@ -809,6 +866,7 @@ define([
             });
         });
 
+
         
         //mark the hidden lineparts
         eMap.forEach(function (eMapY, x) {
@@ -819,11 +877,8 @@ define([
 
                         line.partList.forEach(function (lp) {
 
-                            lp.dasheds = [];
-
                             for (var i = 0; i <= z; ++i) {
-
-                                eMapZ[i].surfaceList.forEach(function (bSurf, z) {
+                                eMapZ[i].surfaceList.forEach(function (bSurf) {
 
                                     lp.dasheds.push(markHidden([bSurf[0], bSurf[1], bSurf[2]], lp));
                                     lp.dasheds.push(markHidden([bSurf[1], bSurf[2], bSurf[3]], lp));
@@ -992,7 +1047,7 @@ define([
 
                 bLine = getLine(bBlock, v.id, bSurface[(idx+1) % 4].id);
                 boLine = getOppositeLine(bBlock, bSurface, bLine);
-                bLineM = [bLine[0].slice(0), bLine[1].slice(0)];
+                bLineM = [bLine[0].slice(0), bLine[1].slice(0)];                
                 boLine = [boLine[0].slice(0), boLine[1].slice(0)];
                 bLineM[0][direction] += offset;
                 bLineM[1][direction] += offset;
@@ -1033,12 +1088,12 @@ define([
                     //     .line3d(bLineM, '#0066FF', 3, 4)
                     //     .line3d(boLine, '#CC66FF', 3, 6);
 
-                    var test = [
-                        isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[0], boLine[0]),
-                        isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[0], boLine[1]),
-                        isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[1], boLine[0]),
-                        isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[1], boLine[1])
-                    ]
+                    // var test = [
+                    //     isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[0], boLine[0]),
+                    //     isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[0], boLine[1]),
+                    //     isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[1], boLine[0]),
+                    //     isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[1], boLine[1])
+                    // ];
 
                     if (isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[0], boLine[0]) ||
                         isPointsInTheSamePlane(aLine[0], aLine[1], aoLine[0], boLine[1]) ||
@@ -1070,7 +1125,7 @@ define([
                                     // glog.line3d([[4,0,0],[4.3,-.2,0]], '#2bff42', 3, 0)
                                     // glog.line3d([[4.3,-.2,0],[4.8,.3,0]], '#2bff42', 3, 0)
 
-                                    console.log('earse', aBlock.id, bBlock.id, direction, aLine.toString(), '|',bLine.toString(), aPart.toString(), '|',bPart.toString());
+                                    // console.log('earse', aBlock.id, bBlock.id, direction, aLine.toString(), '|',bLine.toString(), aPart.toString(), '|',bPart.toString());
                                     aLine.partList.splice(ia--, 1);
                                     bLine.partList.splice(ib--, 1);
                                 }
@@ -1078,7 +1133,7 @@ define([
                         }
                     }
                 }
-            }
+            };
 
             function line2d(line3d, direction) {
 

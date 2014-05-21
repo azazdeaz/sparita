@@ -61,23 +61,25 @@ require([
 
 
     // changePage(pageMenu);
-    changePage(pageGame, {levelNo: 0});
+    changePage(pageGame, {levelNo: 7});
 
     // new Editor({goo:goo, camera:camera});
 
     window.changeEditor = changeEditor;
     window.goo = goo;
     window.camera = camera;
-    window.blueprint = function () {
-        if (window.removeblueprint) window.removeblueprint();
-        var wire = aEditor.calcBlueprint();
-        console.log(wire);
-        // $('body').empty();
-        var cWire = renderWire(wire, 75*wire.divX, 75*wire.divY);
-        console.log(cWire);
-        $('body').append(cWire.css({position:'absolute', zIndex: 98767}));
-        window.removeblueprint = function () {cWire.remove()};
-    }
+    window.blueprint = function() {
+        setTimeout(function () {
+            if (window.removeblueprint) window.removeblueprint();
+            var wire = aEditor.calcBlueprint();
+            console.log(wire);
+            // $('body').empty();
+            var cWire = renderWire(wire, 75*wire.divX, 75*wire.divY);
+            console.log(cWire);
+            $('body').append(cWire.css({position:'absolute', zIndex: 98767}));
+            window.removeblueprint = function () {cWire.remove()};
+        }, 1);
+    };
     window.blueprint()
 
 
@@ -185,6 +187,11 @@ require([
             ctx.moveTo(k(l[0]*sx), k(l[1]*sy));
             ctx.lineTo(k(l[2]*sx), k(l[3]*sy));
         });
+
+        //debug, delMe
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.lineWidth = 6;
 
         wire.dashed.forEach(function (l) {
 
