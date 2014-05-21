@@ -1,20 +1,23 @@
 function removeVisibles() {
-    
+
     surfaces.forEach(function (surface) {
 
         otherLines.forEach(function () {
 
-            
+
         });
     });
 }
 
-function markHidden(tri, line) {
+function markHidden(tri, line, triZOff, lineZOff) {
+
+    triZOff = triZOff || 0;
+    lineZOff = lineZOff || 0;
 
     var lis0 = checkLineIntersection(tri[0], tri[1], line[0], line[1]),
         lis1 = checkLineIntersection(tri[1], tri[2], line[0], line[1]),
         lis2 = checkLineIntersection(tri[2], tri[0], line[0], line[1]),
-        edgeA = (lis0.onLine0 && lis0) || (lis1.onLine0 && lis1) || (lis2.onLine0 && lis2), 
+        edgeA = (lis0.onLine0 && lis0) || (lis1.onLine0 && lis1) || (lis2.onLine0 && lis2),
         edgeB = (lis1.onLine0 && lis1 !== edgeA && lis1) || (lis2.onLine0 && lis2 !== edgeA && lis2),
         dashed = [], cpos, oea, oeb, zDiffA, zDiffB;
 
@@ -32,19 +35,19 @@ function markHidden(tri, line) {
     if (!edgeB) {
         return;
     }
-    
+
     edgeA.isPos = posOnLine(line, edgeA.x, edgeA.y);
     edgeB.isPos = posOnLine(line, edgeB.x, edgeB.y);
-    
+
     if (epsEqu(edgeA.isPos, edgeB.isPos)) {
 
         return;
     }
 
-    edgeA.isZ0 = zInPoint(edgeA.line0, edgeA.x, edgeA.y);
-    edgeA.isZ1 = zInPoint(line, edgeA.x, edgeA.y);
-    edgeB.isZ0 = zInPoint(edgeB.line0, edgeB.x, edgeB.y);
-    edgeB.isZ1 = zInPoint(line, edgeB.x, edgeB.y);
+    edgeA.isZ0 = zInPoint(edgeA.line0, edgeA.x, edgeA.y) + triZOff;
+    edgeA.isZ1 = zInPoint(line, edgeA.x, edgeA.y) + lineZOff;
+    edgeB.isZ0 = zInPoint(edgeB.line0, edgeB.x, edgeB.y) + triZOff;
+    edgeB.isZ1 = zInPoint(line, edgeB.x, edgeB.y) + lineZOff;
 
     zDiffA = edgeA.isZ1 - edgeA.isZ0;
     zDiffB = edgeB.isZ1 - edgeB.isZ0;
@@ -71,7 +74,7 @@ function markHidden(tri, line) {
     else {
         return;
     }
-    
+
     dashed[0] = Math.min(1, Math.max(0, dashed[0]));
     dashed[1] = Math.min(1, Math.max(0, dashed[1]));
 

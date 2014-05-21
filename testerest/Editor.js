@@ -52,9 +52,9 @@ define([
 
         var xi, yi, zi, ci;
         var maxDiv = Math.max(opt.divX, opt.divY, opt.divZ);
-        opt.blockSizeX = 2 / maxDiv; 
-        opt.blockSizeY = 2 / maxDiv; 
-        opt.blockSizeZ = 2 / maxDiv; 
+        opt.blockSizeX = 2 / maxDiv;
+        opt.blockSizeY = 2 / maxDiv;
+        opt.blockSizeZ = 2 / maxDiv;
 
         this._solusion = solusion;
 
@@ -90,11 +90,11 @@ define([
         for (xi = 0; xi < maxDiv; ++xi) {
 
             this._transformModelSceleton[xi] = [];
-            
+
             for (yi = 0; yi < maxDiv; ++yi) {
 
                 this._transformModelSceleton[xi][yi] = [];
-                
+
                 for (zi = 0; zi < maxDiv; ++zi) {
 
                     this._transformModelSceleton[xi][yi][zi] = [];
@@ -124,11 +124,11 @@ define([
         for (xi = 0; xi < opt.divX; ++xi) {
 
             this._mBlock[xi] = [];
-            
+
             for (yi = 0; yi < opt.divY; ++yi) {
 
                 this._mBlock[xi][yi] = [];
-                
+
                 for (zi = 0; zi < opt.divZ; ++zi) {
 
                     var block = new EdiBlock({
@@ -246,7 +246,7 @@ define([
             }
 
             blockIdx = that._blockEntityIdList.indexOf(id);
-            
+
             if (blockIdx !== -1 && blockIdx !== that._lBlock.indexOf(that._aBlock)) {
 
                 if (that._aBlock) {
@@ -333,7 +333,7 @@ define([
     p.testSolusion = function () {
 
         var mState = JSON.parse(JSON.stringify(this._getState())), mTemp;
-        
+
         if (test(mState, this._solusion)) return true;
         mState = this._transformModel(mState, 'z');
         if (test(mState, this._solusion)) return true;
@@ -412,7 +412,7 @@ define([
             for (x = 0; x < mM.dimensions.x; ++x) {
 
                 for (y = 0; y < mM.dimensions.y; ++y) {
-                    
+
                     for (z = 0; z < mM.dimensions.z; ++z) {
 
             // mM.forEach(function (bx, x) {
@@ -426,7 +426,7 @@ define([
                         for (mCidx = 0; mCidx < 8; ++mCidx) {
 
                         // bz.forEach(function (mCorner, mCidx) {
-                            
+
                             for (kCidx = 0; kCidx < 8; ++kCidx) {
 
                             // mK[x][y][z].forEach( function (kCorner) {
@@ -528,11 +528,11 @@ define([
         for (x = 0; x < m.dimensions.x; ++x) {
 
             for (y = 0; y < m.dimensions.y; ++y) {
-                
+
                 for (z = 0; z < m.dimensions.z; ++z) {
 
                     cList = m[x][y][z];
-                    
+
                     //y
                     switch (way) {
 
@@ -564,7 +564,7 @@ define([
                         block = tms[y][(tms.dimensions.y-1) - x][z];
                         copy(block[0], cList[3]);
                         copy(block[1], cList[0]);
-                        copy(block[2], cList[1]);   
+                        copy(block[2], cList[1]);
                         copy(block[3], cList[2]);
                         copy(block[4], cList[7]);
                         copy(block[5], cList[4]);
@@ -624,14 +624,14 @@ define([
 
     //     entity.meshDataComponent.meshData.dataViews.POSITION[3] = 0
     //     entity.meshDataComponent.meshData.dataViews.POSITION[6] = 0
-    //     entity.meshDataComponent.meshData.vertexData._dataNeedsRefresh = true; 
+    //     entity.meshDataComponent.meshData.vertexData._dataNeedsRefresh = true;
 
     //     this.entity.transformComponent.attachChild(entity.transformComponent);
 
     //     entity.meshRendererComponent.materials.push(material);
     //     entity.addToWorld();
     // };
-    
+
     p.calcBlueprint = function (name) {
 
         var oMap = this._getState(), i, j, eMap = [], lineList = [], dashedList = [],
@@ -670,8 +670,8 @@ define([
                 dy.forEach(function (oBlock, z) {
 
                     var eBlock = eMap[x][y][z] = {
-                        vertexList: [], 
-                        lineList: [], 
+                        vertexList: [],
+                        lineList: [],
                         surfaceList: [],
                         coords: [x,y,z],//debug
                         id: blockId++//debug
@@ -704,7 +704,7 @@ define([
                         line.partList = [];
 
                         if (!(line[0][0] === line[1][0] && line[0][1] === line[1][1])) {//skip invisible (one point) lines
-                            
+
                             for (i = 0; i < div; ++i) {
 
                                 lp = [
@@ -732,7 +732,7 @@ define([
             });
         });
 
-        
+
 
         //mark lineparts hidden by an edge
         eMap.forEach(function (eMapY, x) {
@@ -770,8 +770,8 @@ define([
                                         {
                                             var azVal0 = aLp3d[0][2] + (az * oMap.blockDiv.z),
                                                 azVal1 = aLp3d[1][2] + (az * oMap.blockDiv.z),
-                                                bzVal0 = aLp3d[0][2] + (bz * oMap.blockDiv.z),
-                                                bzVal1 = aLp3d[1][2] + (bz * oMap.blockDiv.z);
+                                                bzVal0 = bLp3d[0][2] + (bz * oMap.blockDiv.z),
+                                                bzVal1 = bLp3d[1][2] + (bz * oMap.blockDiv.z);
 
                                             if (azVal0 > bzVal0 || azVal1 > bzVal1) {
                                                 bLp3d.dasheds.push([0, 1]);
@@ -850,7 +850,9 @@ define([
                                             aLp3d[1][1] === bLp3d[0][1]))
                                         {
                                             var azVal = aLp3d[0][2] + (az * oMap.blockDiv.z),
-                                                bzVal = aLp3d[0][2] + (bz * oMap.blockDiv.z);
+                                                bzVal = bLp3d[0][2] + (bz * oMap.blockDiv.z);
+
+                                            if (bLp3d[1][0] === 0 && bLp3d[1][1] === 4 && bLp3d[0][0] === 0 && bLp3d[0][1] === 3) debugger;
 
                                             if (azVal >= bzVal) {
 
@@ -867,31 +869,35 @@ define([
         });
 
 
-        
+
         //mark the hidden lineparts
         eMap.forEach(function (eMapY, x) {
             eMapY.forEach(function (eMapZ, y) {
-                eMapZ.forEach(function (aBlock, z) {
+                eMapZ.forEach(function (aBlock, az) {
 
                     aBlock.lineList.forEach(function (line) {
 
                         line.partList.forEach(function (lp) {
 
-                            for (var i = 0; i <= z; ++i) {
-                                eMapZ[i].surfaceList.forEach(function (bSurf) {
+                            for (var bz = 0; bz <= az; ++bz) {
 
-                                    lp.dasheds.push(markHidden([bSurf[0], bSurf[1], bSurf[2]], lp));
-                                    lp.dasheds.push(markHidden([bSurf[1], bSurf[2], bSurf[3]], lp));
-                                    lp.dasheds.push(markHidden([bSurf[2], bSurf[3], bSurf[0]], lp));
-                                    lp.dasheds.push(markHidden([bSurf[3], bSurf[0], bSurf[1]], lp));
+                                var zOffA = az * oMap.blockDiv.z,
+                                    zOffB = bz * oMap.blockDiv.z;
+                                console.log('zOffA', zOffA, 'zOffB', zOffB)
+                                eMapZ[bz].surfaceList.forEach(function (bSurf) {
+
+                                    lp.dasheds.push(markHidden([bSurf[0], bSurf[1], bSurf[2]], lp, zOffB, zOffA));
+                                    lp.dasheds.push(markHidden([bSurf[1], bSurf[2], bSurf[3]], lp, zOffB, zOffA));
+                                    lp.dasheds.push(markHidden([bSurf[2], bSurf[3], bSurf[0]], lp, zOffB, zOffA));
+                                    lp.dasheds.push(markHidden([bSurf[3], bSurf[0], bSurf[1]], lp, zOffB, zOffA));
                                 });
                             }
 
-                            lp.dasheds = lp.dasheds.filter(function (d) { 
+                            lp.dasheds = lp.dasheds.filter(function (d) {
                                 return d !== undefined;
                             });
 
-                            lp.dasheds.map(function (d) { 
+                            lp.dasheds.map(function (d) {
                                 return d[0] < d[1] ? d : d.reverse();
                             });
 
@@ -969,7 +975,7 @@ define([
                                 if (line[0] > line[2]) {//pointing left
 
                                     // line.flippedX = true;
-                                    
+
                                     tempX = line[0],
                                     tempY = line[1];
 
@@ -981,7 +987,7 @@ define([
                                 else if (line[0] - line[2] === 0 && line[1] > line[3]) {//vertical and pointing up
 
                                     // line.flippedY = true;
-                                    
+
                                     tempY = line[1];
 
                                     line[1] = line[3];
@@ -994,7 +1000,7 @@ define([
                     });
                 });
             });
-        }); 
+        });
         mergeLines(lineList);
         mergeLines(dashedList);
 
@@ -1004,7 +1010,7 @@ define([
         return ret;
 
         //------------------------------------------------------------------------------------------
-        
+
 
         function removeMathcingLineparts(aBlock, bBlock, direction, fullSize, cb) {
 
@@ -1020,7 +1026,7 @@ define([
                         if (bSurface[0][direction] === 0 &&
                             bSurface[1][direction] === 0 &&
                             bSurface[2][direction] === 0 &&
-                            bSurface[3][direction] === 0) 
+                            bSurface[3][direction] === 0)
                         {
                             earseMatchingLines(aBlock, bBlock, aSurface, bSurface, direction);
                         }
@@ -1033,7 +1039,7 @@ define([
 
             // console.log(aBlock.id, bBlock.id, direction, aBlock.coords, bBlock.coords, aSurface.toString(), bSurface.toString());
 
-            var aLineList = [], bLineList = [], aoLineList = [], boLineList = [], 
+            var aLineList = [], bLineList = [], aoLineList = [], boLineList = [],
                 i, j, ia, ib, aLine, bLine, aoLine, boLine, aPart, bPart, bLineM, bLineMList = [],
                 offset = oMap.blockDiv[['x', 'y', 'z'][direction]];
 
@@ -1047,7 +1053,7 @@ define([
 
                 bLine = getLine(bBlock, v.id, bSurface[(idx+1) % 4].id);
                 boLine = getOppositeLine(bBlock, bSurface, bLine);
-                bLineM = [bLine[0].slice(0), bLine[1].slice(0)];                
+                bLineM = [bLine[0].slice(0), bLine[1].slice(0)];
                 boLine = [boLine[0].slice(0), boLine[1].slice(0)];
                 bLineM[0][direction] += offset;
                 bLineM[1][direction] += offset;
@@ -1108,17 +1114,17 @@ define([
                             aPart = line2d(aLine.partList[ia], direction);
 
                             for (ib = 0; ib < bLine.partList.length; ++ib) {
-                                
+
                                 bPart = line2d(bLine.partList[ib], direction);
-                                
-                                
-                                if ((aPart[0] === bPart[0] && 
-                                     aPart[1] === bPart[1] && 
+
+
+                                if ((aPart[0] === bPart[0] &&
+                                     aPart[1] === bPart[1] &&
                                      aPart[2] === bPart[2] &&
                                      aPart[3] === bPart[3])
                                     ||
-                                    (aPart[0] === bPart[2] && 
-                                     aPart[1] === bPart[3] && 
+                                    (aPart[0] === bPart[2] &&
+                                     aPart[1] === bPart[3] &&
                                      aPart[2] === bPart[0] &&
                                      aPart[3] === bPart[1]))
                                 {
@@ -1172,11 +1178,11 @@ define([
         function getLine(block, vidx0, vidx1) {
 
             var ret;
-            
+
             block.lineList.forEach(function (line) {
 
                 if ((line[0].id === vidx0 && line[1].id === vidx1) ||
-                    (line[0].id === vidx1 && line[1].id === vidx0)) 
+                    (line[0].id === vidx1 && line[1].id === vidx0))
                 {
                     ret = line;
                 }
@@ -1206,7 +1212,7 @@ define([
                 &&
 
                 ((d0x === 0 && d1x === 0 && l0[0] === l1[0]) ||
-                (d0y === 0 && d1y === 0 && l0[1] === l1[1]) || 
+                (d0y === 0 && d1y === 0 && l0[1] === l1[1]) ||
                 (
                     (d0x !== 0 && d0y !== 0 && d1x !== 0 && d1y !== 0) &&
                     (l0[1] + (slope0 * (l1[0] - l0[0])) === l1[1]) &&
@@ -1263,7 +1269,7 @@ define([
 
     function earseHiddenDasheds(lineList, dashedList) {
 
-        var i, j, l0, l1, slope0; 
+        var i, j, l0, l1, slope0;
 
         for (i = 0; i < dashedList.length; ++i) {
 
@@ -1309,7 +1315,7 @@ define([
 
     function mv(v0, v1) { //matchingVertexes
 
-        return v0[0] === v1[0] && v0[1] === v1[1] && v0[2] === v1[2]; 
+        return v0[0] === v1[0] && v0[1] === v1[1] && v0[2] === v1[2];
     }
 
     function isPointsInTheSamePlane (p0, p1, p2, p3) {
@@ -1320,7 +1326,7 @@ define([
             for (j = 0; j < i; ++j) {
 
                 if (mv(pl[i], pl[j]))  {
-                    
+
                     pl.splice(i--, 1);
                     break;
                 }
@@ -1373,7 +1379,7 @@ define([
 
         return gcd(b, a % b);
     };
-    
+
     p.destroy = function () {
         $(this.opt.goo.renderer.domElement).off('mousedown', this._pick);
     }
@@ -1417,7 +1423,7 @@ var glog = (function () {
 
         line3d: function (line, _color,  _strokeWidth, _off) {
             glog.style(_color,  _strokeWidth, _off);
-            
+
             ctx.beginPath();
             ctx.save();
             ctx.translate(200, 200);
@@ -1425,7 +1431,7 @@ var glog = (function () {
             ctx.lineWidth = lineWidth;
             ctx.shadowBlur = color;
             ctx.shadowColor = '#000';
-            ctx.moveTo((line[0][0] + line[0][2]*.4)*30+off, 120 - (line[0][1] + line[0][2]*.23)*30); 
+            ctx.moveTo((line[0][0] + line[0][2]*.4)*30+off, 120 - (line[0][1] + line[0][2]*.23)*30);
             ctx.lineTo((line[1][0] + line[1][2]*.4)*30+off, 120 - (line[1][1] + line[1][2]*.23)*30);
             ctx.stroke();
             ctx.restore();

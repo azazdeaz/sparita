@@ -43,7 +43,7 @@ require([
     $(goo.renderer.domElement).attr('id', 'goo-canvas')
     // goo.renderer.setSize(800, 450);
     goo.renderer.setClearColor(0, 0, 0);
-    
+
     var light = new PointLight();
     light.color.set(1,1,0);
     var lightEntity = EntityUtils.createTypicalEntity( goo.world, light);
@@ -61,7 +61,7 @@ require([
 
 
     // changePage(pageMenu);
-    changePage(pageGame, {levelNo: 7});
+    changePage(pageGame, {levelNo: undefined});
 
     // new Editor({goo:goo, camera:camera});
 
@@ -93,7 +93,7 @@ require([
             level = JSON.parse(LevelList[levelNo]);
         }
         else {
-            level =  {"editorOpt":{"blockSizeX":1,"blockSizeY":1,"blockSizeZ":1,"blockDivX":3,"blockDivY":3,"blockDivZ":3,"divX":2,"divY":1,"divZ":1},"solusion":[[[[[1,0,0],[3,0,0],[2,0,3],[0,0,3],[1,3,0],[3,3,0],[2,3,3],[0,3,3]]]],[[[[0,0,0],[2,0,0],[3,0,3],[1,0,3],[0,3,0],[2,3,0],[3,3,3],[1,3,3]]]]],
+            level =  {"editorOpt":{"blockSizeX":1,"blockSizeY":1,"blockSizeZ":1,"blockDivX":4,"blockDivY":4,"blockDivZ":4,"divX":1,"divY":1,"divZ":2},"solusion":[[[[[1,0,0],[3,0,0],[2,0,3],[0,0,3],[1,3,0],[3,3,0],[2,3,3],[0,3,3]]]],[[[[0,0,0],[2,0,0],[3,0,3],[1,0,3],[0,3,0],[2,3,0],[3,3,3],[1,3,3]]]]],
             wireList: [
                 {
                     name: 'front',
@@ -345,11 +345,11 @@ require([
 
             btnPlay = createButton({
                 caption: 'Play',
-                w: 234, 
-                h: 76, 
+                w: 234,
+                h: 76,
                 top: 10,
                 left: 20,
-                fontSize: 67, 
+                fontSize: 67,
                 parent: 'body',
                 rotAxis: 'rotationY',
                 transformOrigin: '0px 0px',
@@ -361,11 +361,11 @@ require([
 
             btnResume = createButton({
                 caption: 'Resume',
-                w: 294, 
-                h: 76, 
+                w: 294,
+                h: 76,
                 top: 10,
                 left: 20,
-                fontSize: 67, 
+                fontSize: 67,
                 parent: 'body',
                 rotAxis: 'rotationY',
                 transformOrigin: '0px 0px',
@@ -393,7 +393,7 @@ require([
                 .appendTo('body');
 
             resize();
-            $(window).resize(resize);            
+            $(window).resize(resize);
 
             inited = true;
         }
@@ -449,7 +449,7 @@ require([
 
     function createLevelsPage () {
 
-        var page = {}, inited = false, btnW = 62, btnH = 54, m = 12, divX = 4, divY = 4, 
+        var page = {}, inited = false, btnW = 62, btnH = 54, m = 12, divX = 4, divY = 4,
             btnList = [], btnBack;
 
         var $root = $('<div>')
@@ -460,11 +460,11 @@ require([
 
         btnBack = createButton({
             caption: 'back to menu',
-            w: 234, 
-            h: 32, 
+            w: 234,
+            h: 32,
             top: 10,
             left: 20,
-            fontSize: 28, 
+            fontSize: 28,
             parent: 'body',
             click: function () {
                 changePage(pageMenu);
@@ -477,11 +477,11 @@ require([
 
                 var btn = createButton({
                     caption: LevelList[i] ? (i+1) : 'X',
-                    w: btnW + 4 * Math.random(), 
-                    h: btnH + 4 * Math.random(), 
+                    w: btnW + 4 * Math.random(),
+                    h: btnH + 4 * Math.random(),
                     left: (i % divX) * (btnW + m) + 4 * Math.random(),
                     top: ~~(i/divX) * (btnH + m) + 4 * Math.random(),
-                    fontSize: 44 + 8 * Math.random(), 
+                    fontSize: 44 + 8 * Math.random(),
                     parent: $root,
                     rotAxis: 'rotationY',
                     transformOrigin: '0px 0px',
@@ -551,21 +551,21 @@ require([
 
     function createGamePage () {
 
-        var page = {}, inited = false, btnVerify, btnBack, wireHit, btnSuccess, btnMistake, 
+        var page = {}, inited = false, btnVerify, btnBack, wireHit, btnSuccess, btnMistake,
             btnMCSetT, openOpt, btnUndo, btnRedo, btnReset, btnMaterial,
             tweenOptWireActive = { rotationY: 0, autoAlpha: 1, ease: Sine.easeOut },
             tweenOptWireInactive = { rotationY: -56, autoAlpha:.7, ease: Sine.easeOut },
             tweenOptWireClose = { rotationY: -90, autoAlpha: 1, ease: Sine.easeOut };
-        
+
         function init() {
 
             btnVerify = createButton({
                 caption: 'Verify',
-                w: 234, 
-                h: 76, 
+                w: 234,
+                h: 76,
                 top: 10,
                 left: 20,
-                fontSize: 67, 
+                fontSize: 67,
                 parent: 'body',
                 click: function () {
                     if (aEditor.testSolusion()) {
@@ -586,11 +586,11 @@ require([
 
             btnUndo = createButton({
                 caption: '<',
-                w: 23, 
-                h: 23, 
+                w: 23,
+                h: 23,
                 top: 100,
                 left: 20,
-                fontSize: 20, 
+                fontSize: 20,
                 parent: 'body',
                 click: function () {
                     aEditor.undo();
@@ -599,11 +599,11 @@ require([
 
             btnRedo = createButton({
                 caption: '>',
-                w: 23, 
-                h: 23, 
+                w: 23,
+                h: 23,
                 top: 100,
                 left: 45,
-                fontSize: 20, 
+                fontSize: 20,
                 parent: 'body',
                 click: function () {
                     aEditor.redo();
@@ -612,11 +612,11 @@ require([
 
             btnReset = createButton({
                 caption: 'reset',
-                w: 93, 
-                h: 23, 
+                w: 93,
+                h: 23,
                 top: 100,
                 left: 70,
-                fontSize: 20, 
+                fontSize: 20,
                 parent: 'body',
                 click: function () {
                     while(aEditor.undo()){};
@@ -626,11 +626,11 @@ require([
 
             btnMaterial = createButton({
                 caption: 'material',
-                w: 143, 
-                h: 23, 
+                w: 143,
+                h: 23,
                 top: 125,
                 left: 20,
-                fontSize: 20, 
+                fontSize: 20,
                 parent: 'body',
                 click: function () {
                     aEditor.changeMaterial();
@@ -639,11 +639,11 @@ require([
 
             btnBack = createButton({
                 caption: 'back to menu',
-                w: 234, 
-                h: 32, 
+                w: 234,
+                h: 32,
                 top: 10,
                 left: 20,
-                fontSize: 28, 
+                fontSize: 28,
                 parent: 'body',
                 click: function () {
                     changePage(pageMenu);
@@ -653,11 +653,11 @@ require([
 
             btnSuccess = createButton({
                 caption: 'Prefect!\nnext level! ->',
-                w: 234, 
-                h: 90, 
+                w: 234,
+                h: 90,
                 top: 10,
                 left: 20,
-                fontSize: 36, 
+                fontSize: 36,
                 parent: 'body',
                 color: '#4f9',
                 click: function () {
@@ -672,11 +672,11 @@ require([
 
             btnMistake = createButton({
                 caption: 'Not yet!',
-                w: 234, 
-                h: 39, 
+                w: 234,
+                h: 39,
                 top: 10,
                 left: 20,
-                fontSize: 36, 
+                fontSize: 36,
                 parent: 'body',
                 color: '#f27',
                 click: function () {
@@ -688,7 +688,7 @@ require([
                 .css({
                     position: 'absolute',
                     right: 0,
-                    top: 0, 
+                    top: 0,
                     width: 136,
                     height: $(window).height(),
                     visibility: 'hidden'
@@ -704,7 +704,7 @@ require([
                 });
 
             resize();
-            $(window).resize(resize);            
+            $(window).resize(resize);
 
             inited = true;
         }
