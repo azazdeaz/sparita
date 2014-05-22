@@ -26,6 +26,7 @@ gulp.task('styles', function () {
 gulp.task('vendor', function () {
   return gulp.src([
       // bower + '/lodash/dist/lodash.js',
+      bower + '/threejs/build/three.js',
       bower + '/jquery/dist/jquery.js',
       bower + '/foundation/js/foundation.js'
     ])

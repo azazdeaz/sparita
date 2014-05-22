@@ -5,7 +5,8 @@ var $ = require('jquery'),
 	pages = {
 		'menu': function () { return require('./menu.js'); },
 		'levels': function () { return require('./levels.js'); },
-		'challenge': function () { return require('./challenge.js'); }
+		'challenge': function () { return require('./challenge.js'); },
+		'design': function () { return require('./design.js'); }
 	};
 
 	

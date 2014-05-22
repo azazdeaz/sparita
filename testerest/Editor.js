@@ -849,12 +849,12 @@ define([
                                             aLp3d[1][0] === bLp3d[0][0] &&
                                             aLp3d[1][1] === bLp3d[0][1]))
                                         {
-                                            var azVal = aLp3d[0][2] + (az * oMap.blockDiv.z),
-                                                bzVal = bLp3d[0][2] + (bz * oMap.blockDiv.z);
+                                            var azVal0 = aLp3d[0][2] + (az * oMap.blockDiv.z),
+                                                azVal1 = aLp3d[1][2] + (az * oMap.blockDiv.z),
+                                                bzVal0 = bLp3d[0][2] + (bz * oMap.blockDiv.z),
+                                                bzVal1 = bLp3d[1][2] + (bz * oMap.blockDiv.z);
 
-                                            if (bLp3d[1][0] === 0 && bLp3d[1][1] === 4 && bLp3d[0][0] === 0 && bLp3d[0][1] === 3) debugger;
-
-                                            if (azVal >= bzVal) {
+                                            if (azVal0 >= bzVal0 && azVal1 >= bzVal1) {
 
                                                 bLine3d.partList.splice(bi--, 1);
                                             }
@@ -867,7 +867,7 @@ define([
                 });
             });
         });
-
+        
 
 
         //mark the hidden lineparts
@@ -879,7 +879,7 @@ define([
 
                         line.partList.forEach(function (lp) {
 
-                            for (var bz = 0; bz <= az; ++bz) {
+                            for (var bz = az; bz < oMap.dimensions.z; ++bz) {
 
                                 var zOffA = az * oMap.blockDiv.z,
                                     zOffB = bz * oMap.blockDiv.z;
@@ -900,6 +900,8 @@ define([
                             lp.dasheds.map(function (d) {
                                 return d[0] < d[1] ? d : d.reverse();
                             });
+
+                            //merge
 
                             for (var i0 = 0; i0 < lp.dasheds.length; ++i0) {
 
@@ -1267,51 +1269,7 @@ define([
         }
     }
 
-    function earseHiddenDasheds(lineList, dashedList) {
 
-        var i, j, l0, l1, slope0;
-
-        for (i = 0; i < dashedList.length; ++i) {
-
-            l0 = lineList[i];
-            slope0 = (l0[3]-l0[1]) / (l0[2]-l0[0]);
-
-            for (j = 0; j < lineList.length; ++j) {
-
-                l1 = lineList[j];
-
-                if (i !== j) {
-
-                    if (isOverlapping2DLines (l0, l1))
-                    {
-                        if (l0[2] - l0[0] === 0) {//is horisontal
-                            l0[1] = Math.min(l0[1], l1[1], l0[3], l1[3]);
-                            l0[3] = Math.max(l0[1], l1[1], l0[3], l1[3]);
-                        }
-                        else {
-                            l0[0] = Math.min(l0[0], l1[0]);
-                            l0[2] = Math.max(l0[2], l1[2]);
-
-                            if (slope0 > 0) {
-                                l0[1] = Math.min(l0[1], l1[1]);
-                                l0[3] = Math.max(l0[3], l1[3]);
-                            }
-                            else if (slope0 < 0) {
-                                l0[1] = Math.max(l0[1], l1[1]);
-                                l0[3] = Math.min(l0[3], l1[3]);
-                            }
-                        }
-
-                        lineList.splice(j, 1);
-                        if (i > j) {
-                            --i;
-                        }
-                        --j;
-                    }
-                }
-            }
-        }
-    }
 
     function mv(v0, v1) { //matchingVertexes
 
@@ -1320,38 +1278,12 @@ define([
 
     function isPointsInTheSamePlane (p0, p1, p2, p3) {
 
-        var a0, a1, i, j, pl = Array.prototype.slice.call(arguments);
-
-        for (i = 1; i < pl.length; ++i) { //remove the duplications
-            for (j = 0; j < i; ++j) {
-
-                if (mv(pl[i], pl[j]))  {
-
-                    pl.splice(i--, 1);
-                    break;
-                }
-            }
-        }
-
-        if (pl.length < 4) {
-
-            return true;
-        }
-
-        for (i = 3; i < pl.length; ++i) {
-
-            a0 = areaOfTriangle(distance3d(p0, p2), distance3d(p2, p3), distance3d(p3, p0))
-                + areaOfTriangle(distance3d(p0, p2), distance3d(p2, p1), distance3d(p1, p0));
+        var a0 = areaOfTriangle(distance3d(p0, p2), distance3d(p2, p3), distance3d(p3, p0))
+                + areaOfTriangle(distance3d(p0, p2), distance3d(p2, p1), distance3d(p1, p0)),
             a1 = areaOfTriangle(distance3d(p1, p3), distance3d(p3, p2), distance3d(p2, p1))
                 + areaOfTriangle(distance3d(p0, p1), distance3d(p1, p3), distance3d(p3, p0));
 
-            if (Math.abs(a0 - a1) < 0.0000000001) {
-
-                return false;
-            }
-        }
-
-        return [true, a0, a1, p0, p1, p2, p3];
+        return epsEqu(a0, a1);
     }
     // window.isPointsInTheSamePlane = isPointsInTheSamePlane;
 
@@ -1370,7 +1302,6 @@ define([
         var cd = Math.sqrt(xd*xd + yd*yd);
         return Math.sqrt(cd*cd + zd*zd);
     }
-    //var tp = [[0,0,3],[0,3,3],[3,2,2],[3,0,2],[3,0,2],[3,2,2],[6,1,1],[6,1,0]]
 
     function gcd(a, b) {
         if ( ! b) {

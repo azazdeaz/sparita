@@ -16,4 +16,8 @@ menu.$root.find('#btn-challenge').click(function () {
 	pager.open('challenge');
 });
 
+menu.$root.find('#btn-design').click(function () {
+	pager.open('design');
+});
+
 module.exports = menu;

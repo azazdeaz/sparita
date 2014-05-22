@@ -93,7 +93,7 @@ require([
             level = JSON.parse(LevelList[levelNo]);
         }
         else {
-            level =  {"editorOpt":{"blockSizeX":1,"blockSizeY":1,"blockSizeZ":1,"blockDivX":4,"blockDivY":4,"blockDivZ":4,"divX":1,"divY":1,"divZ":2},"solusion":[[[[[1,0,0],[3,0,0],[2,0,3],[0,0,3],[1,3,0],[3,3,0],[2,3,3],[0,3,3]]]],[[[[0,0,0],[2,0,0],[3,0,3],[1,0,3],[0,3,0],[2,3,0],[3,3,3],[1,3,3]]]]],
+            level =  {"editorOpt":{"blockSizeX":1,"blockSizeY":1,"blockSizeZ":1,"blockDivX":3,"blockDivY":3,"blockDivZ":3,"divX":1,"divY":1,"divZ":2},"solusion":[[[[[1,0,0],[3,0,0],[2,0,3],[0,0,3],[1,3,0],[3,3,0],[2,3,3],[0,3,3]]]],[[[[0,0,0],[2,0,0],[3,0,3],[1,0,3],[0,3,0],[2,3,0],[3,3,3],[1,3,3]]]]],
             wireList: [
                 {
                     name: 'front',
