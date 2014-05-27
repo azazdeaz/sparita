@@ -788,32 +788,100 @@ define([
 
 
         //"merge" cubes (by remove matching lineparts)
-        eMap.forEach(function (eMapY, x) {
-            eMapY.forEach(function (eMapZ, y) {
-                eMapZ.forEach(function (aBlock, z) {
+        eachBlock(function (aBlock, ax, ay, az) {
 
-                    var bBlock;
+            var m;
 
-                    if (eMap[x+1]) {
+            aBlock.lineList.forEach(function (aLine3d) {
 
-                        bBlock = eMap[x+1][y][z];
-                        removeMathcingLineparts(aBlock, bBlock, 0, oMap.blockDiv.x);
+                for (var ai = 0; ai < aLine3d.partList.length; ++ai) {
+
+                    var matches = [];
+
+                    eachBlock(function (bBlock, bx, by, bz) {
+
+                        bBlock.lineList.forEach(function (bLine3d) {
+
+                            if (aLine3d === bLine3d) return;
+
+                            for (var bi = 0; bi < bLine3d.partList.length; ++bi) {
+
+                                if (isMatchingLineparts3d(aLine3d.partList[ai], bLine3d.partList[bi])) {
+
+                                    matches.push(preareMatch())
+                                }
+                            }
+                        });
+                    });
+
+                    if (matches.length) {
+
+                        for (var i = 0; i < matches.length; ++i) {
+                            for (var j = 0; j < matches.length; ++j) {
+
+                                if (matche[i].block === matche[j].block) {
+                                    //TODO merge them properly
+                                    --j;
+                                }
+                                else if (mergeMaches(matches[i], matches[j])) {
+                                    --j;
+                                }
+                            }
+                        }
                     }
 
-                    if (eMap[x][y+1]) {
+                    if (matches.length === 1) {
 
-                        bBlock = eMap[x][y+1][z];
-                        removeMathcingLineparts(aBlock, bBlock, 1, oMap.blockDiv.y);
+                        m = matches[0];
+
+                        if (isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[0], m.boLine[0]) ||
+                            isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[0], m.boLine[1]) ||
+                            isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[1], m.boLine[0]) ||
+                            isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[1], m.boLine[1]))
+                        {
+                            removeLinePart(matches[0]);
+                        }
                     }
+                    else if (matches.length > 1) {
 
-                    if (eMap[x][y][z+1]) {
-
-                        bBlock = eMap[x][y][z+1];
-                        removeMathcingLineparts(aBlock, bBlock, 2, oMap.blockDiv.z);
+                        matches.slice(1).map(removeLinePart);
                     }
-                });
+                }
             });
         });
+
+        function mergeMatches(m0, m1) {
+
+            if (m0[0][0] === m1[1][0] && m0[1][0] === m1[0][0] && m0[0][0] === m1[1][0] &&
+                m0.coord[0] ===  m1.coord[0])
+
+            return (la[0][0] === la[1][0] && la[1][0] === lb[0][0] && lb[0][0] === lb[1][0]) ||
+                   (la[0][1] === la[1][1] && la[1][1] === lb[0][1] && lb[0][1] === lb[1][1]) ||
+                   (la[0][2] === la[1][2] && la[1][2] === lb[0][2] && lb[0][2] === lb[1][2]);
+        }
+
+        function removeLinePart(match) {
+
+            match.line.lineParts.splice(match.lpIdx, 1);
+        }
+
+        function isMatchingLineparts3d(lpa, lpb) {
+
+            return (lpa[0][0] === lpb[0][0] &&
+                    lpa[0][1] === lpb[0][1] &&
+                    lpa[0][2] === lpb[0][2] &&
+                    lpa[1][0] === lpb[1][0] &&
+                    lpa[1][1] === lpb[1][1] &&
+                    lpa[1][2] === lpb[1][2])
+                   ||
+                   (lpa[0][0] === lpb[1][0] &&
+                    lpa[0][1] === lpb[1][1] &&
+                    lpa[0][2] === lpb[1][2] &&
+                    lpa[1][0] === lpb[0][0] &&
+                    lpa[1][1] === lpb[0][1] &&
+                    lpa[1][2] === lpb[0][2]));
+        }
+
 
         //remove the overlapping lineparts (but the first)
         eMap.forEach(function (eMapY, x) {
@@ -830,9 +898,7 @@ define([
 
                                 bBlock.lineList.forEach(function (bLine3d) {
 
-                                    if (aLine3d === bLine3d) {
-                                        return;
-                                    }
+                                    if (aLine3d === bLine3d) return;
 
                                     for (var bi = 0; bi < bLine3d.partList.length; ++bi) {
 
@@ -867,7 +933,7 @@ define([
                 });
             });
         });
-        
+
 
 
         //mark the hidden lineparts
@@ -1013,6 +1079,18 @@ define([
 
         //------------------------------------------------------------------------------------------
 
+
+
+        function eachBlock(cb) {
+            eMap.forEach(function (eMapY, x) {
+                eMapY.forEach(function (eMapZ, y) {
+                    eMapZ.forEach(function (block, z) {
+
+                        cb(block, x, y, z);
+                    }
+                }
+            }
+        }
 
         function removeMathcingLineparts(aBlock, bBlock, direction, fullSize, cb) {
 
