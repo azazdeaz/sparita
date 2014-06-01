@@ -1,8 +1,8 @@
 'use strict';
 
-var lastRender, uSize = 30,
-    cubesX = 1, cubesY = 2, cubesZ = 3,
-    divX = 3, divY = 3, divZ = 3;
+var lastRender, uSize = 12,
+    cubesX = 4, cubesY = 2, cubesZ = 3,
+    divX = 2, divY = 1, divZ = 3;
 
 // set the scene size
 var WIDTH = 400,
@@ -41,39 +41,72 @@ camera.position.z = 300;
 // start the renderer
 renderer.setSize(WIDTH, HEIGHT);
 
+function getTexture(cubesX, cubesY, divX, divY) {
 
-var bitmap = document.createElement('canvas');
-bitmap.width = 100;
-bitmap.height = 100;
-var ctx = bitmap.getContext('2d');
-ctx.fillStyle = '#ff3382';
-ctx.fillRect(0, 0, 100, 100);
-ctx.fillStyle = '#36ff14';
-ctx.fillRect(10, 10, 80, 80);
+  var bitmap = document.createElement('canvas'),
+    ctx = bitmap.getContext('2d'), pos;
 
+  bitmap.width = cubesX * divX * uSize;
+  bitmap.height = cubesY * divY * uSize;
+  ctx.fillStyle =  'eeeded';
+  ctx.fillRect(0, 0, bitmap.width, bitmap.height);
+  ctx.strokeStyle =  'a0a0a0';
 
-// create the cube's material
+  for (var cx = 0; cx <= cubesX; ++cx) {
+    
+    pos = cx * divX * uSize;
+    line(pos, 0, pos, bitmap.height, 2);
 
-var materials = [], faceMaterial, texture;
-texture = new THREE.Texture(bitmap);
-texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set(cubesX, cubesY);
+    for (var dx = 0; cx < cubesX && dx < divX; ++dx) {
+
+      pos = (cx * divX + dx) * uSize;
+      line(pos, 0, pos, bitmap.height, 1);
+    }
+  }
+
+  for (var cy = 0; cy <= cubesY; ++cy) {
+    
+    pos = cy * divY * uSize;
+    line(0, pos, bitmap.width, pos, 2);
+
+    for (var dy = 0; cy < cubesY && dy < divY; ++dy) {
+
+      pos = (cy * divY + dy) * uSize;
+      line(0, pos, bitmap.width, pos, 1);
+    }
+  }
+
+  document.body.appendChild(bitmap)
+  return bitmap;
+
+  function line(sx, sy, ex, ey, lineWidth) {
+
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(ex, ey);
+    ctx.stroke();
+  }
+}
+
+var materials = [], material, texture;
+
+texture = new THREE.Texture(getTexture(cubesZ, cubesY, divZ, divY));
 texture.needsUpdate = true;
-materials.push(new THREE.MeshBasicMaterial({map: texture}));
+material = new THREE.MeshBasicMaterial({map: texture});
+materials.push(material, material);
 
-texture = new THREE.Texture(bitmap);
-texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set(cubesZ, cubesY);
+texture = new THREE.Texture(getTexture(cubesX, cubesZ, divX, divZ));
 texture.needsUpdate = true;
-materials.push(new THREE.MeshBasicMaterial({map: texture}));
+material = new THREE.MeshBasicMaterial({map: texture});
+materials.push(material, material);
 
-texture = new THREE.Texture(bitmap);
-texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set(cubesX, cubesZ);
+texture = new THREE.Texture(getTexture(cubesX, cubesY, divX, divY));
 texture.needsUpdate = true;
-materials.push(new THREE.MeshBasicMaterial({map: texture}));
+material = new THREE.MeshBasicMaterial({map: texture});
+materials.push(material, material);
 
-var cubeMaterial = new THREE.MeshFaceMaterial(materials);
+var cubeMaterial = new THREE.MeshFaceMaterial(materials.concat(materials));
 
 
 
@@ -81,7 +114,7 @@ var cubeMaterial = new THREE.MeshFaceMaterial(materials);
 // create a new mesh with
 // cube geometry - we will cover
 // the cubeMaterial next!
-var cube = new THREE.Mesh(new THREE.CubeGeometry(
+var cube = window.cube= new THREE.Mesh(new THREE.BoxGeometry(
   uSize * cubesX * divX, 
   uSize * cubesY * divY, 
   uSize * cubesZ * divZ), cubeMaterial);
