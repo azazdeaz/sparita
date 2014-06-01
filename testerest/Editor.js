@@ -802,7 +802,9 @@ define([
 
                         bBlock.lineList.forEach(function (bLine3d) {
 
-                            if (aLine3d === bLine3d) return;
+                            if (aLine3d === bLine3d) {
+                                return;
+                            }
 
                             for (var bi = 0; bi < bLine3d.partList.length; ++bi) {
 
@@ -862,51 +864,97 @@ define([
                     }
                 }
             });
-        });
 
-        function prepareMatch(block, line, lp) {
+            function prepareMatch(block, line, lp) {
 
-            return {
-                lp: lp,
-                line: line,
-                oLineA: undefined,
-                oLIneB: undefined,
-                clear: function () {
-                    var idx = line.lineParts.indexOf(lp);
-                    
-                    if (idx !== -1) {
-                        line.lineParts.splice(idx, 1);
+                var oLines = getOppositeLines(block, line);
+
+                return {
+                    lp: lp,
+                    line: line,
+                    oLineA: oLines[0],
+                    oLineB: oLines[1],
+                    clear: function () {
+                        var idx = line.partList.indexOf(lp);
+                        
+                        if (idx !== -1) {
+                            line.partList.splice(idx, 1);
+                        }
                     }
+                };
+            }
+
+            function mergeMatches(m0, m1) {
+
+                if (m0[0][0] === m1[1][0] && m0[1][0] === m1[0][0] && m0[0][0] === m1[1][0] &&
+                    m0.coord[0] ===  m1.coord[0])
+
+                return (la[0][0] === la[1][0] && la[1][0] === lb[0][0] && lb[0][0] === lb[1][0]) ||
+                       (la[0][1] === la[1][1] && la[1][1] === lb[0][1] && lb[0][1] === lb[1][1]) ||
+                       (la[0][2] === la[1][2] && la[1][2] === lb[0][2] && lb[0][2] === lb[1][2]);
+            }
+
+            function isMatchingLineparts3d(lpa, lpb) {
+
+                return (lpa[0][0] === lpb[0][0] &&
+                        lpa[0][1] === lpb[0][1] &&
+                        lpa[0][2] === lpb[0][2] &&
+                        lpa[1][0] === lpb[1][0] &&
+                        lpa[1][1] === lpb[1][1] &&
+                        lpa[1][2] === lpb[1][2])
+                       ||
+                       (lpa[0][0] === lpb[1][0] &&
+                        lpa[0][1] === lpb[1][1] &&
+                        lpa[0][2] === lpb[1][2] &&
+                        lpa[1][0] === lpb[0][0] &&
+                        lpa[1][1] === lpb[0][1] &&
+                        lpa[1][2] === lpb[0][2]);
+            }
+
+            function getOppositeLines(block, line) {
+
+                var ret = [], lineVertexes = [], oVertexes = [];
+
+                block.surfaceList.forEach(function (surface) {
+
+                    lineVertexes.length = 0;
+                    oVertexes.length = 0;
+
+                    surface.forEach(function (v) {
+
+                        if(line.indexOf(v) !== -1) {
+                            lineVertexes.push(v);
+                        }
+                        else {
+                            oVertexes.push(v);
+                        }
+                    });
+
+                    if (lineVertexes.length === 2) {
+
+                        ret.push(getLine(block, oVertexes[0].id, oVertexes[1].id))
+                    }
+                });
+
+                if (ret.length !== 2) debugger;//delMe
+
+                return ret;
+            }
+
+            function getLine(block, vidx0, vidx1) {
+
+                for (var line, i = 0, l = block.lineList.length; i < l; ++i) {
+
+                    line = block.lineList[i];
+
+                    if ((line[0].id === vidx0 && line[1].id === vidx1) ||
+                        (line[0].id === vidx1 && line[1].id === vidx0))
+                    {
+                        return line;
+                    }                    
                 }
-            };
-        }
-
-        function mergeMatches(m0, m1) {
-
-            if (m0[0][0] === m1[1][0] && m0[1][0] === m1[0][0] && m0[0][0] === m1[1][0] &&
-                m0.coord[0] ===  m1.coord[0])
-
-            return (la[0][0] === la[1][0] && la[1][0] === lb[0][0] && lb[0][0] === lb[1][0]) ||
-                   (la[0][1] === la[1][1] && la[1][1] === lb[0][1] && lb[0][1] === lb[1][1]) ||
-                   (la[0][2] === la[1][2] && la[1][2] === lb[0][2] && lb[0][2] === lb[1][2]);
-        }
-
-        function isMatchingLineparts3d(lpa, lpb) {
-
-            return (lpa[0][0] === lpb[0][0] &&
-                    lpa[0][1] === lpb[0][1] &&
-                    lpa[0][2] === lpb[0][2] &&
-                    lpa[1][0] === lpb[1][0] &&
-                    lpa[1][1] === lpb[1][1] &&
-                    lpa[1][2] === lpb[1][2])
-                   ||
-                   (lpa[0][0] === lpb[1][0] &&
-                    lpa[0][1] === lpb[1][1] &&
-                    lpa[0][2] === lpb[1][2] &&
-                    lpa[1][0] === lpb[0][0] &&
-                    lpa[1][1] === lpb[0][1] &&
-                    lpa[1][2] === lpb[0][2]);
-        }
+            }
+        });
 
 
         //remove the overlapping lineparts (but the first)
