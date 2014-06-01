@@ -808,7 +808,7 @@ define([
 
                                 if (isMatchingLineparts3d(aLine3d.partList[ai], bLine3d.partList[bi])) {
 
-                                    matches.push(preareMatch())
+                                    matches.push(prepareMatch(aBlock, aLine3d, aLine3d.partList[ai]));
                                 }
                             }
                         });
@@ -819,9 +819,21 @@ define([
                         for (var i = 0; i < matches.length; ++i) {
                             for (var j = 0; j < matches.length; ++j) {
 
-                                if (matche[i].block === matche[j].block) {
-                                    //TODO merge them properly
-                                    --j;
+                                if (i === j) {
+                                    continue;
+                                }
+
+                                if (matches[i].block === matches[j].block) {
+                                    
+                                    var im = matches[i],
+                                        jm = matches.splice(j--, 1)[0];
+
+                                    if (im.oLineA === jm.line) {
+                                        im.oLineA = jm.line
+                                    }
+                                    else if (im.oLineB === jm.line) {
+                                        im.oLineB = jm.line
+                                    }x
                                 }
                                 else if (mergeMaches(matches[i], matches[j])) {
                                     --j;
@@ -834,21 +846,40 @@ define([
 
                         m = matches[0];
 
-                        if (isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[0], m.boLine[0]) ||
-                            isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[0], m.boLine[1]) ||
-                            isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[1], m.boLine[0]) ||
-                            isPointsInTheSamePlane(m.aLine[0], m.aLine[1], m.aoLine[1], m.boLine[1]))
+                        if (isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[0], m.oLineB[0]) ||
+                            isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[0], m.oLineB[1]) ||
+                            isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[1], m.oLineB[0]) ||
+                            isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[1], m.oLineB[1]))
                         {
-                            removeLinePart(matches[0]);
+                            matches[0].clear();
                         }
                     }
                     else if (matches.length > 1) {
 
-                        matches.slice(1).map(removeLinePart);
+                        matches.slice(1).forEach(function (match) {
+                            match.clear();
+                        });
                     }
                 }
             });
         });
+
+        function prepareMatch(block, line, lp) {
+
+            return {
+                lp: lp,
+                line: line,
+                oLineA: undefined,
+                oLIneB: undefined,
+                clear: function () {
+                    var idx = line.lineParts.indexOf(lp);
+                    
+                    if (idx !== -1) {
+                        line.lineParts.splice(idx, 1);
+                    }
+                }
+            };
+        }
 
         function mergeMatches(m0, m1) {
 
@@ -858,11 +889,6 @@ define([
             return (la[0][0] === la[1][0] && la[1][0] === lb[0][0] && lb[0][0] === lb[1][0]) ||
                    (la[0][1] === la[1][1] && la[1][1] === lb[0][1] && lb[0][1] === lb[1][1]) ||
                    (la[0][2] === la[1][2] && la[1][2] === lb[0][2] && lb[0][2] === lb[1][2]);
-        }
-
-        function removeLinePart(match) {
-
-            match.line.lineParts.splice(match.lpIdx, 1);
         }
 
         function isMatchingLineparts3d(lpa, lpb) {
@@ -879,7 +905,7 @@ define([
                     lpa[0][2] === lpb[1][2] &&
                     lpa[1][0] === lpb[0][0] &&
                     lpa[1][1] === lpb[0][1] &&
-                    lpa[1][2] === lpb[0][2]));
+                    lpa[1][2] === lpb[0][2]);
         }
 
 
@@ -1087,9 +1113,9 @@ define([
                     eMapZ.forEach(function (block, z) {
 
                         cb(block, x, y, z);
-                    }
-                }
-            }
+                    });
+                });
+            });
         }
 
         function removeMathcingLineparts(aBlock, bBlock, direction, fullSize, cb) {
