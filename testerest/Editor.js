@@ -634,6 +634,8 @@ define([
 
     p.calcBlueprint = function (name) {
 
+        glog.clear();//debug
+
         var oMap = this._getState(), i, j, eMap = [], lineList = [], dashedList = [],
             surfaceVidxList = [
                 [0, 1, 2, 3],
@@ -674,6 +676,7 @@ define([
                         lineList: [],
                         surfaceList: [],
                         coords: [x,y,z],//debug
+                        pos: [x * oMap.blockDiv.x, y * oMap.blockDiv.y, z * oMap.blockDiv.z],
                         id: blockId++//debug
                     };
 
@@ -703,6 +706,8 @@ define([
                         //split line
                         line.partList = [];
 
+                        glog.line3d(line, 'rgba(255,255,255,.2)', 1, eBlock.pos);//debug
+
                         if (!(line[0][0] === line[1][0] && line[0][1] === line[1][1])) {//skip invisible (one point) lines
 
                             for (i = 0; i < div; ++i) {
@@ -713,7 +718,7 @@ define([
                                 ];
                                 lp.dasheds = [];
 
-                                line.partList.push(lp)
+                                line.partList.push(lp);
                             }
                         }
 
@@ -774,6 +779,7 @@ define([
                                                 bzVal1 = bLp3d[1][2] + (bz * oMap.blockDiv.z);
 
                                             if (azVal0 > bzVal0 || azVal1 > bzVal1) {
+
                                                 bLp3d.dasheds.push([0, 1]);
                                             }
                                         }
@@ -788,7 +794,7 @@ define([
 
 
         //"merge" cubes (by remove matching lineparts)
-        eachBlock(function (aBlock, ax, ay, az) {
+        eachBlock(function (aBlock) {
 
             var m;
 
@@ -796,9 +802,10 @@ define([
 
                 for (var ai = 0; ai < aLine3d.partList.length; ++ai) {
 
+
                     var matches = [];
 
-                    eachBlock(function (bBlock, bx, by, bz) {
+                    eachBlock(function (bBlock) {
 
                         bBlock.lineList.forEach(function (bLine3d) {
 
@@ -808,7 +815,11 @@ define([
 
                             for (var bi = 0; bi < bLine3d.partList.length; ++bi) {
 
-                                if (isMatchingLineparts3d(aLine3d.partList[ai], bLine3d.partList[bi])) {
+                                if (isMatchingLineparts3d(aLine3d.partList[ai], aBlock, bLine3d.partList[bi], bBlock)) {
+
+                                    // var color = '#' + parseInt(0xffffff * Math.random()).toString(16).substr(-3);
+                                    // glog.line3d(aLine3d.partList[ai], color, 1, aBlock.pos);//debug
+                                    // glog.line3d(bLine3d.partList[bi], color, 1, bBlock.pos);//debug
 
                                     matches.push(prepareMatch(aBlock, aLine3d, aLine3d.partList[ai]));
                                 }
@@ -826,7 +837,7 @@ define([
                                 }
 
                                 if (matches[i].block === matches[j].block) {
-                                    
+
                                     var im = matches[i],
                                         jm = matches.splice(j--, 1)[0];
 
@@ -835,7 +846,7 @@ define([
                                     }
                                     else if (im.oLineB === jm.line) {
                                         im.oLineB = jm.line
-                                    }x
+                                    }
                                 }
                                 else if (mergeMaches(matches[i], matches[j])) {
                                     --j;
@@ -871,11 +882,13 @@ define([
 
                 return {
                     lp: lp,
-                    line: line,
                     oLineA: oLines[0],
                     oLineB: oLines[1],
                     clear: function () {
+                        
                         var idx = line.partList.indexOf(lp);
+
+                        glog.line3d(lp, 'rgba(23, 45, 234, .43)', 1, block);//debug
                         
                         if (idx !== -1) {
                             line.partList.splice(idx, 1);
@@ -886,29 +899,32 @@ define([
 
             function mergeMatches(m0, m1) {
 
-                if (m0[0][0] === m1[1][0] && m0[1][0] === m1[0][0] && m0[0][0] === m1[1][0] &&
-                    m0.coord[0] ===  m1.coord[0])
+                // if (m0[0][0] === m1[1][0] && m0[1][0] === m1[0][0] && m0[0][0] === m1[1][0] &&
+                //     m0.coord[0] ===  m1.coord[0])
 
                 return (la[0][0] === la[1][0] && la[1][0] === lb[0][0] && lb[0][0] === lb[1][0]) ||
                        (la[0][1] === la[1][1] && la[1][1] === lb[0][1] && lb[0][1] === lb[1][1]) ||
                        (la[0][2] === la[1][2] && la[1][2] === lb[0][2] && lb[0][2] === lb[1][2]);
             }
 
-            function isMatchingLineparts3d(lpa, lpb) {
+            function isMatchingLineparts3d(lpa, aBlock, lpb, bBlock) {
 
-                return (lpa[0][0] === lpb[0][0] &&
-                        lpa[0][1] === lpb[0][1] &&
-                        lpa[0][2] === lpb[0][2] &&
-                        lpa[1][0] === lpb[1][0] &&
-                        lpa[1][1] === lpb[1][1] &&
-                        lpa[1][2] === lpb[1][2])
+                var aPos = aBlock.pos,
+                    bPos = bBlock.pos;
+
+                return (lpa[0][0] + aPos[0] === lpb[0][0] + bPos[0] &&
+                        lpa[0][1] + aPos[1] === lpb[0][1] + bPos[1] &&
+                        lpa[0][2] + aPos[2] === lpb[0][2] + bPos[2] &&
+                        lpa[1][0] + aPos[0] === lpb[1][0] + bPos[0] &&
+                        lpa[1][1] + aPos[1] === lpb[1][1] + bPos[1] &&
+                        lpa[1][2] + aPos[2] === lpb[1][2] + bPos[2])
                        ||
-                       (lpa[0][0] === lpb[1][0] &&
-                        lpa[0][1] === lpb[1][1] &&
-                        lpa[0][2] === lpb[1][2] &&
-                        lpa[1][0] === lpb[0][0] &&
-                        lpa[1][1] === lpb[0][1] &&
-                        lpa[1][2] === lpb[0][2]);
+                       (lpa[0][0] + aPos[0] === lpb[1][0] + bPos[0] &&
+                        lpa[0][1] + aPos[1] === lpb[1][1] + bPos[1] &&
+                        lpa[0][2] + aPos[2] === lpb[1][2] + bPos[2] &&
+                        lpa[1][0] + aPos[0] === lpb[0][0] + bPos[0] &&
+                        lpa[1][1] + aPos[1] === lpb[0][1] + bPos[1] &&
+                        lpa[1][2] + aPos[2] === lpb[0][2] + bPos[2]);
             }
 
             function getOppositeLines(block, line) {
@@ -1023,7 +1039,7 @@ define([
 
                                 var zOffA = az * oMap.blockDiv.z,
                                     zOffB = bz * oMap.blockDiv.z;
-                                console.log('zOffA', zOffA, 'zOffB', zOffB)
+
                                 eMapZ[bz].surfaceList.forEach(function (bSurf) {
 
                                     lp.dasheds.push(markHidden([bSurf[0], bSurf[1], bSurf[2]], lp, zOffB, zOffA));
@@ -1190,8 +1206,6 @@ define([
         }
 
         function earseMatchingLines(aBlock, bBlock, aSurface, bSurface, direction) {
-
-            // console.log(aBlock.id, bBlock.id, direction, aBlock.coords, bBlock.coords, aSurface.toString(), bSurface.toString());
 
             var aLineList = [], bLineList = [], aoLineList = [], boLineList = [],
                 i, j, ia, ib, aLine, bLine, aoLine, boLine, aPart, bPart, bLineM, bLineMList = [],
@@ -1489,10 +1503,9 @@ var glog = (function () {
 
     var glog = {
 
-        style: function (_color,  _strokeWidth, _off) {
+        style: function (_color,  _strokeWidth) {
 
             color = _color === undefined ? color : _color;
-            off = _off === undefined ? off : _off;
             strokeWidth = _strokeWidth === undefined ? strokeWidth : _strokeWidth;
 
             return glog;
@@ -1504,18 +1517,25 @@ var glog = (function () {
             return glog;
         },
 
-        line3d: function (line, _color,  _strokeWidth, _off) {
-            glog.style(_color,  _strokeWidth, _off);
+        line3d: function (line, _color,  _strokeWidth, cubeCoord) {
+            glog.style(_color,  _strokeWidth);
+
+            var s = 30, bottom = 0, zvx = .23, zvy = .4;
 
             ctx.beginPath();
             ctx.save();
-            ctx.translate(200, 200);
+            ctx.translate(200, 300);
+            if (cubeCoord) {
+                ctx.translate(
+                    (cubeCoord[0] + cubeCoord[2] * zvx)*s*1.32, 
+                    (-cubeCoord[1] + cubeCoord[2] * zvy)*s*1.32);
+            }
             ctx.strokeStyle = color;
             ctx.lineWidth = lineWidth;
             ctx.shadowBlur = color;
             ctx.shadowColor = '#000';
-            ctx.moveTo((line[0][0] + line[0][2]*.4)*30+off, 120 - (line[0][1] + line[0][2]*.23)*30);
-            ctx.lineTo((line[1][0] + line[1][2]*.4)*30+off, 120 - (line[1][1] + line[1][2]*.23)*30);
+            ctx.moveTo((line[0][0] + line[0][2]*zvx)*s, (-line[0][1] + line[0][2]*zvy)*s);
+            ctx.lineTo((line[1][0] + line[1][2]*zvx)*s, (-line[1][1] + line[1][2]*zvy)*s);
             ctx.stroke();
             ctx.restore();
 
