@@ -803,7 +803,7 @@ define([
                 for (var ai = 0; ai < aLine3d.partList.length; ++ai) {
 
 
-                    var matches = [];
+                    var matches = [prepareMatch(aBlock, aLine3d, aLine3d.partList[ai])];
 
                     eachBlock(function (bBlock) {
 
@@ -821,7 +821,7 @@ define([
                                     // glog.line3d(aLine3d.partList[ai], color, 1, aBlock.pos);//debug
                                     // glog.line3d(bLine3d.partList[bi], color, 1, bBlock.pos);//debug
 
-                                    matches.push(prepareMatch(aBlock, aLine3d, aLine3d.partList[ai]));
+                                    matches.push(prepareMatch(bBlock, bLine3d, bLine3d.partList[bi]));
                                 }
                             }
                         });
@@ -836,7 +836,7 @@ define([
                                     continue;
                                 }
 
-                                if (matches[i].block === matches[j].block) {
+                                if (matches[i].block === matches[j].block) {//on the same cube
 
                                     var im = matches[i],
                                         jm = matches.splice(j--, 1)[0];
@@ -848,8 +848,9 @@ define([
                                         im.oLineB = jm.line
                                     }
                                 }
-                                else if (mergeMaches(matches[i], matches[j])) {
-                                    --j;
+                                else if (mergeMatches(matches[i], matches[j])) {
+
+                                    matches.splice(j--, 1);
                                 }
                             }
                         }
@@ -859,10 +860,10 @@ define([
 
                         m = matches[0];
 
-                        if (isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[0], m.oLineB[0]) ||
-                            isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[0], m.oLineB[1]) ||
-                            isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[1], m.oLineB[0]) ||
-                            isPointsInTheSamePlane(m.line[0], m.line[1], m.oLineA[1], m.oLineB[1]))
+                        if (isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[0], m.oLineB[0]) ||
+                            isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[0], m.oLineB[1]) ||
+                            isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[1], m.oLineB[0]) ||
+                            isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[1], m.oLineB[1]))
                         {
                             matches[0].clear();
                         }
@@ -882,14 +883,15 @@ define([
 
                 return {
                     lp: lp,
+                    block: block,
                     oLineA: oLines[0],
                     oLineB: oLines[1],
                     clear: function () {
-                        
+
+                        glog.line3d(lp, 'rgba(23, 45, 234, .43)', 1, block.pos)
+
                         var idx = line.partList.indexOf(lp);
 
-                        glog.line3d(lp, 'rgba(23, 45, 234, .43)', 1, block);//debug
-                        
                         if (idx !== -1) {
                             line.partList.splice(idx, 1);
                         }
@@ -899,12 +901,46 @@ define([
 
             function mergeMatches(m0, m1) {
 
-                // if (m0[0][0] === m1[1][0] && m0[1][0] === m1[0][0] && m0[0][0] === m1[1][0] &&
-                //     m0.coord[0] ===  m1.coord[0])
+                    // glog.line3d(m0.lp, 'rgba(23, 45, 234, .43)', 1, m0.block.pos);//debug
+                    // glog.line3d(m1.lp, 'rgba(223, 45, 34, .43)', 1, m1.block.pos);//debug
 
-                return (la[0][0] === la[1][0] && la[1][0] === lb[0][0] && lb[0][0] === lb[1][0]) ||
-                       (la[0][1] === la[1][1] && la[1][1] === lb[0][1] && lb[0][1] === lb[1][1]) ||
-                       (la[0][2] === la[1][2] && la[1][2] === lb[0][2] && lb[0][2] === lb[1][2]);
+                var neighbourSides = [
+                    Math.abs(m0.block.coords[0] - m1.block.coords[0]),
+                    Math.abs(m0.block.coords[1] - m1.block.coords[1]),
+                    Math.abs(m0.block.coords[2] - m1.block.coords[2])
+                ];
+
+                if (neighbourSides.reduce(function (a, b) {return a + b}) !== 1) {
+                    //cubes are not next to each other
+                    return;
+                }
+
+                var cs = neighbourSides.indexOf(1), //common side index
+                    b0 = m0.block.pos[cs],
+                    b1 = m1.block.pos[cs],
+                    l0a = [m0.oLineA[0][cs] + b0, m0.oLineA[1][cs] + b0],
+                    l0b = [m0.oLineB[0][cs] + b0, m0.oLineB[1][cs] + b0],
+                    l1a = [m1.oLineA[0][cs] + b1, m1.oLineA[1][cs] + b1],
+                    l1b = [m1.oLineB[0][cs] + b1, m1.oLineB[1][cs] + b1];
+
+                l0a = l0a[0] === l0a[1] ? l0a[0] : false; //check whether the line is on the common side
+                l0b = l0b[0] === l0b[1] ? l0b[0] : false;
+                l1a = l1a[0] === l1a[1] ? l1a[0] : false;
+                l1b = l1b[0] === l1b[1] ? l1b[0] : false;
+
+                if (l0a !== false) {
+
+                    if (l0a === l1a) return m0.oLineA = m1.oLineB;
+                    if (l0a === l1b) return m0.oLineA = m1.oLineA;
+                }
+
+                if (l0b !== false) {
+
+                    if (l0b === l1a) return m0.oLineB = m1.oLineB;
+                    if (l0b === l1b) return m0.oLineB = m1.oLineA;
+                }
+
+                return false;
             }
 
             function isMatchingLineparts3d(lpa, aBlock, lpb, bBlock) {
@@ -967,7 +1003,7 @@ define([
                         (line[0].id === vidx1 && line[1].id === vidx0))
                     {
                         return line;
-                    }                    
+                    }
                 }
             }
         });
@@ -1527,7 +1563,7 @@ var glog = (function () {
             ctx.translate(200, 300);
             if (cubeCoord) {
                 ctx.translate(
-                    (cubeCoord[0] + cubeCoord[2] * zvx)*s*1.32, 
+                    (cubeCoord[0] + cubeCoord[2] * zvx)*s*1.32,
                     (-cubeCoord[1] + cubeCoord[2] * zvy)*s*1.32);
             }
             ctx.strokeStyle = color;
