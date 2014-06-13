@@ -839,18 +839,18 @@ define([
                                 if (matches[i].block === matches[j].block) {//on the same cube
 
                                     var im = matches[i],
-                                        jm = matches.splice(j--, 1)[0];
+                                        jm = matches.splice(j--, 1)[0].clear();
 
                                     if (im.oLineA === jm.line) {
-                                        im.oLineA = jm.line
+                                        im.oLineA = jm.line;
                                     }
                                     else if (im.oLineB === jm.line) {
-                                        im.oLineB = jm.line
+                                        im.oLineB = jm.line;
                                     }
                                 }
                                 else if (mergeMatches(matches[i], matches[j])) {
 
-                                    matches.splice(j--, 1);
+                                    matches.splice(j--, 1)[0].clear();
                                 }
                             }
                         }
@@ -860,10 +860,14 @@ define([
 
                         m = matches[0];
 
-                        if (isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[0], m.oLineB[0]) ||
-                            isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[0], m.oLineB[1]) ||
-                            isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[1], m.oLineB[0]) ||
-                            isPointsInTheSamePlane(m.lp[0], m.lp[1], m.oLineA[1], m.oLineB[1]))
+                        glog.line3d(m.lp, 'rgba(23, 45, 234, .43)', 1, m.block.pos);//debug
+                        glog.line3d(m.oLineA, 'rgba(23, 245, 34, .43)', 1, m.block.pos);//debug
+                        glog.line3d(m.oLineB, 'rgba(234, 45, 4, .43)', 1, m.block.pos);//debug
+
+                        if (isPointsInTheSamePlane(m.lp[0], m.oLineA[0], m.lp[1], m.oLineB[0]) ||
+                            isPointsInTheSamePlane(m.lp[0], m.oLineA[0], m.lp[1], m.oLineB[1]) ||
+                            isPointsInTheSamePlane(m.lp[0], m.oLineA[1], m.lp[1], m.oLineB[0]) ||
+                            isPointsInTheSamePlane(m.lp[0], m.oLineA[1], m.lp[1], m.oLineB[1]))
                         {
                             matches[0].clear();
                         }
@@ -930,14 +934,14 @@ define([
 
                 if (l0a !== false) {
 
-                    if (l0a === l1a) return m0.oLineA = m1.oLineB;
-                    if (l0a === l1b) return m0.oLineA = m1.oLineA;
+                    if (l0a === l1a) return m0.oLineA = translateLine(m1.oLineB, m1.block, m0.block);
+                    if (l0a === l1b) return m0.oLineA = translateLine(m1.oLineA, m1.block, m0.block);
                 }
 
                 if (l0b !== false) {
 
-                    if (l0b === l1a) return m0.oLineB = m1.oLineB;
-                    if (l0b === l1b) return m0.oLineB = m1.oLineA;
+                    if (l0b === l1a) return m0.oLineB = translateLine(m1.oLineB, m1.block, m0.block);
+                    if (l0b === l1b) return m0.oLineB = translateLine(m1.oLineA, m1.block, m0.block);
                 }
 
                 return false;
@@ -1005,6 +1009,19 @@ define([
                         return line;
                     }
                 }
+            }
+
+            function translateLine(aLine, aBlock, bBlock) {
+
+                var offX = aBlock.pos[0] - bBlock.pos[0],
+                    offY = aBlock.pos[1] - bBlock.pos[1],
+                    offZ = aBlock.pos[2] - bBlock.pos[2];
+
+
+                return [
+                    [aLine[0][0] + offX, aLine[0][1] + offY, aLine[0][2] + offZ],
+                    [aLine[1][0] + offX, aLine[1][1] + offY, aLine[1][2] + offZ]
+                ];
             }
         });
 
@@ -1487,7 +1504,6 @@ define([
 
         return epsEqu(a0, a1);
     }
-    // window.isPointsInTheSamePlane = isPointsInTheSamePlane;
 
     function areaOfTriangle(edge1, edge2, edge3) {
 
