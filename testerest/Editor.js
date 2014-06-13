@@ -1,4 +1,4 @@
-define([
+    define([
     'EdiBlock',
     'underscore',
     'goo/entities/EntityUtils',
@@ -839,13 +839,18 @@ define([
                                 if (matches[i].block === matches[j].block) {//on the same cube
 
                                     var im = matches[i],
-                                        jm = matches.splice(j--, 1)[0].clear();
+                                        jm = matches.splice(j--, 1)[0];
 
                                     if (im.oLineA === jm.line) {
                                         im.oLineA = jm.line;
+                                        jm.clear();
                                     }
                                     else if (im.oLineB === jm.line) {
                                         im.oLineB = jm.line;
+                                        jm.clear();
+                                    }
+                                    else {
+                                        throw Error()//debug
                                     }
                                 }
                                 else if (mergeMatches(matches[i], matches[j])) {
@@ -860,9 +865,9 @@ define([
 
                         m = matches[0];
 
-                        glog.line3d(m.lp, 'rgba(23, 45, 234, .43)', 1, m.block.pos);//debug
-                        glog.line3d(m.oLineA, 'rgba(23, 245, 34, .43)', 1, m.block.pos);//debug
-                        glog.line3d(m.oLineB, 'rgba(234, 45, 4, .43)', 1, m.block.pos);//debug
+                        // glog.line3d(m.lp, 'rgba(23, 45, 234, .43)', 1, m.block.pos);//debug
+                        // glog.line3d(m.oLineA, 'rgba(23, 245, 34, .43)', 1, m.block.pos);//debug
+                        // glog.line3d(m.oLineB, 'rgba(234, 45, 4, .43)', 1, m.block.pos);//debug
 
                         if (isPointsInTheSamePlane(m.lp[0], m.oLineA[0], m.lp[1], m.oLineB[0]) ||
                             isPointsInTheSamePlane(m.lp[0], m.oLineA[0], m.lp[1], m.oLineB[1]) ||
@@ -887,6 +892,7 @@ define([
 
                 return {
                     lp: lp,
+                    line: line,
                     block: block,
                     oLineA: oLines[0],
                     oLineB: oLines[1],
@@ -1502,7 +1508,18 @@ define([
             a1 = areaOfTriangle(distance3d(p1, p3), distance3d(p3, p2), distance3d(p2, p1))
                 + areaOfTriangle(distance3d(p0, p1), distance3d(p1, p3), distance3d(p3, p0));
 
-        return epsEqu(a0, a1);
+        var ret = epsEqu(a0, a1);
+
+        if (ret) {
+
+            glog.line3d([p0, p2], 'random', 1);//debug
+            glog.line3d([p2, p1], 'random', 1);//debug
+            glog.line3d([p1, p3], 'random', 1);//debug
+            glog.line3d([p3, p0], 'random', 1);//debug
+            1+1;
+        }
+
+        return ret;
     }
 
     function areaOfTriangle(edge1, edge2, edge3) {
@@ -1556,6 +1573,10 @@ var glog = (function () {
     var glog = {
 
         style: function (_color,  _strokeWidth) {
+
+            if (_color === 'random') {
+                _color = '#' + parseInt(0xffffffffffff * Math.random()).toString(16).substr(-6);
+            }
 
             color = _color === undefined ? color : _color;
             strokeWidth = _strokeWidth === undefined ? strokeWidth : _strokeWidth;
