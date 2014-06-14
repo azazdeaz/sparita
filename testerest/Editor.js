@@ -840,16 +840,17 @@
 
                                     var im = matches[i],
                                         jm = matches.splice(j--, 1)[0];
+                                    
+                                    jm.clear();
 
                                     if (im.oLineA === jm.line) {
-                                        im.oLineA = jm.line;
-                                        jm.clear();
+
+                                        im.oLineA = im.line === jm.oLineA ? jm.oLineB : jm.oLineA;
                                     }
                                     else if (im.oLineB === jm.line) {
-                                        im.oLineB = jm.line;
-                                        jm.clear();
+                                        im.oLineB = im.line === jm.oLineA ? jm.oLineB : jm.oLineA;
                                     }
-                                    else {
+                                    else {//debug
                                         throw Error()//debug
                                     }
                                 }
@@ -898,7 +899,7 @@
                     oLineB: oLines[1],
                     clear: function () {
 
-                        glog.line3d(lp, 'rgba(23, 45, 234, .43)', 1, block.pos)
+                        // glog.line3d(lp, 'rgba(23, 45, 234, .43)', 1, block.pos)
 
                         var idx = line.partList.indexOf(lp);
 
@@ -911,9 +912,6 @@
 
             function mergeMatches(m0, m1) {
 
-                    // glog.line3d(m0.lp, 'rgba(23, 45, 234, .43)', 1, m0.block.pos);//debug
-                    // glog.line3d(m1.lp, 'rgba(223, 45, 34, .43)', 1, m1.block.pos);//debug
-
                 var neighbourSides = [
                     Math.abs(m0.block.coords[0] - m1.block.coords[0]),
                     Math.abs(m0.block.coords[1] - m1.block.coords[1]),
@@ -924,6 +922,9 @@
                     //cubes are not next to each other
                     return;
                 }
+
+                    glog.line3d(m0.lp, 'rgba(23, 45, 234, .43)', 1, m0.block.pos);//debug
+                    glog.line3d(m1.lp, 'rgba(223, 45, 34, .43)', 1, m1.block.pos);//debug
 
                 var cs = neighbourSides.indexOf(1), //common side index
                     b0 = m0.block.pos[cs],
@@ -1510,14 +1511,14 @@
 
         var ret = epsEqu(a0, a1);
 
-        if (ret) {
+        // if (ret) {//debug
 
-            glog.line3d([p0, p2], 'random', 1);//debug
-            glog.line3d([p2, p1], 'random', 1);//debug
-            glog.line3d([p1, p3], 'random', 1);//debug
-            glog.line3d([p3, p0], 'random', 1);//debug
-            1+1;
-        }
+        //     glog.line3d([p0, p2], 'random', 1);//debug
+        //     glog.line3d([p2, p1], 'random', 1);//debug
+        //     glog.line3d([p1, p3], 'random', 1);//debug
+        //     glog.line3d([p3, p0], 'random', 1);//debug
+        //     1+1;
+        // }
 
         return ret;
     }
