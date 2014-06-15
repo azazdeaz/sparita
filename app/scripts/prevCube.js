@@ -1,5 +1,7 @@
 'use strict';
 
+
+
 var lastRender, uSize = 12,
     cubesX = 4, cubesY = 2, cubesZ = 3,
     divX = 2, divY = 1, divZ = 3;
@@ -114,7 +116,7 @@ var cubeMaterial = new THREE.MeshFaceMaterial(materials.concat(materials));
 // create a new mesh with
 // cube geometry - we will cover
 // the cubeMaterial next!
-var cube = window.cube= new THREE.Mesh(new THREE.BoxGeometry(
+var cube = new THREE.Mesh(new THREE.BoxGeometry(
   uSize * cubesX * divX, 
   uSize * cubesY * divY, 
   uSize * cubesZ * divZ), cubeMaterial);
@@ -125,14 +127,14 @@ cube.rotation.y = 23;
 scene.add(cube);
 
 
-// create a point light
-var pointLight = new THREE.PointLight(0xFFFFFF);
-// set its position
-pointLight.position.x = 10;
-pointLight.position.y = 50;
-pointLight.position.z = 130;
-// add to the scene
-scene.add(pointLight);
+// // create a point light
+// var pointLight = new THREE.PointLight(0xFFFFFF);
+// // set its position
+// pointLight.position.x = 10;
+// pointLight.position.y = 50;
+// pointLight.position.z = 130;
+// // add to the scene
+// scene.add(pointLight);
 
 // draw!
 renderer.render(scene, camera);

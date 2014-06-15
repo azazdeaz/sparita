@@ -11,7 +11,7 @@ var pager = require('./pager.js'),
 	$ = require('jquery'),
 	foundation = require('foundation');
 
-pager.open('menu');
+pager.open('gamepage');
 
 $('nav #menu').click(pager.open.bind(null, 'menu'));
 
