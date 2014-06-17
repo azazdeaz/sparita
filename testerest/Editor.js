@@ -827,8 +827,9 @@
                         });
                     });
 
-                    if (matches.length) {
+                    if (matches.length > 1) {//just for optimalisation
 
+                        //merge matches on the same blocks
                         for (var i = 0; i < matches.length; ++i) {
                             for (var j = 0; j < matches.length; ++j) {
 
@@ -840,7 +841,7 @@
 
                                     var im = matches[i],
                                         jm = matches.splice(j--, 1)[0];
-                                    
+
                                     jm.clear();
 
                                     if (im.oLineA === jm.line) {
@@ -854,11 +855,18 @@
                                         throw Error()//debug
                                     }
                                 }
-                                else if (mergeMatches(matches[i], matches[j])) {
-
-                                    matches.splice(j--, 1)[0].clear();
-                                }
                             }
+                        }
+
+                        //merge the matches on different blocks
+                        for (var k = 0; k < matches.length; ++k) {
+
+                            mergeMatches(matches[k], 'oLineA', matches);
+                        }
+
+                        for (var l = 0; l < matches.length; ++l) {
+
+                            mergeMatches(matches[l], 'oLineB', matches);
                         }
                     }
 
@@ -899,7 +907,7 @@
                     oLineB: oLines[1],
                     clear: function () {
 
-                        // glog.line3d(lp, 'rgba(23, 45, 234, .43)', 1, block.pos)
+                        glog.line3d(lp, 'rgba(23, 45, 234, .43)', 1, block.pos)
 
                         var idx = line.partList.indexOf(lp);
 
@@ -910,48 +918,80 @@
                 };
             }
 
-            function mergeMatches(m0, m1) {
+            function mergeMatches(m0, m0oLineName, matches) {
 
-                var neighbourSides = [
-                    Math.abs(m0.block.coords[0] - m1.block.coords[0]),
-                    Math.abs(m0.block.coords[1] - m1.block.coords[1]),
-                    Math.abs(m0.block.coords[2] - m1.block.coords[2])
-                ];
+                var neighbourMatch,
+                    commonSideIndex,
+                    nextOLineName;
 
-                if (neighbourSides.reduce(function (a, b) {return a + b}) !== 1) {
-                    //cubes are not next to each other
-                    return;
+                if (getNeighbour() &&
+                    getNextOppositeLine())
+                {
+                    neighbourMatch.clear();
+                    matches.splice(matches.indexOf(neighbourMatch), 1);
+
+                    mergeMatches(neighbourMatch, nextOLineName, matches);
+
+                    m0[m0oLineName] = neighbourMatch[nextOLineName];
                 }
 
-                    glog.line3d(m0.lp, 'rgba(23, 45, 234, .43)', 1, m0.block.pos);//debug
-                    glog.line3d(m1.lp, 'rgba(223, 45, 34, .43)', 1, m1.block.pos);//debug
+                function getNeighbour() {
 
-                var cs = neighbourSides.indexOf(1), //common side index
-                    b0 = m0.block.pos[cs],
-                    b1 = m1.block.pos[cs],
-                    l0a = [m0.oLineA[0][cs] + b0, m0.oLineA[1][cs] + b0],
-                    l0b = [m0.oLineB[0][cs] + b0, m0.oLineB[1][cs] + b0],
-                    l1a = [m1.oLineA[0][cs] + b1, m1.oLineA[1][cs] + b1],
-                    l1b = [m1.oLineB[0][cs] + b1, m1.oLineB[1][cs] + b1];
+                    for (var i = 0; i < matches.length; ++i) {
 
-                l0a = l0a[0] === l0a[1] ? l0a[0] : false; //check whether the line is on the common side
-                l0b = l0b[0] === l0b[1] ? l0b[0] : false;
-                l1a = l1a[0] === l1a[1] ? l1a[0] : false;
-                l1b = l1b[0] === l1b[1] ? l1b[0] : false;
+                        var neighbourSides, m1 = matches[i];
 
-                if (l0a !== false) {
+                        if (m0 === m1) {
 
-                    if (l0a === l1a) return m0.oLineA = translateLine(m1.oLineB, m1.block, m0.block);
-                    if (l0a === l1b) return m0.oLineA = translateLine(m1.oLineA, m1.block, m0.block);
+                            continue;
+                        }
+
+                        neighbourSides = [
+                            Math.abs(m0.block.coords[0] - m1.block.coords[0]),
+                            Math.abs(m0.block.coords[1] - m1.block.coords[1]),
+                            Math.abs(m0.block.coords[2] - m1.block.coords[2])
+                        ];
+
+                        if (neighbourSides.reduce(function (a, b) {return a + b}) === 1) {
+                            //cubes are next to each other
+                            neighbourMatch = m1;
+                            commonSideIndex = neighbourSides.indexOf(1);
+
+                            return true;
+                        }
+                    }
                 }
 
-                if (l0b !== false) {
+                function getNextOppositeLine() {
 
-                    if (l0b === l1a) return m0.oLineB = translateLine(m1.oLineB, m1.block, m0.block);
-                    if (l0b === l1b) return m0.oLineB = translateLine(m1.oLineA, m1.block, m0.block);
+                    var cs = commonSideIndex,
+                        m1 = neighbourMatch,
+                        m0oLine = m0[m0oLineName],
+                        b0 = m0.block.pos[cs],
+                        b1 = m1.block.pos[cs],
+                        l0 = [m0oLine[0][cs] + b0, m0oLine[1][cs] + b0],
+                        l1a = [m1.oLineA[0][cs] + b1, m1.oLineA[1][cs] + b1],
+                        l1b = [m1.oLineB[0][cs] + b1, m1.oLineB[1][cs] + b1];
+
+                    l0 = l0[0] === l0[1] ? l0[0] : false; //check whether the line is on the common side
+                    l1a = l1a[0] === l1a[1] ? l1a[0] : false;
+                    l1b = l1b[0] === l1b[1] ? l1b[0] : false;
+
+                    if (l0 !== false) {
+
+                        if (l0 === l1a) {
+
+                            nextOLineName = 'oLineB';
+                            return true;
+                        }
+
+                        if (l0 === l1b) {
+
+                            nextOLineName = 'oLineA';
+                            return true;
+                        }
+                    }
                 }
-
-                return false;
             }
 
             function isMatchingLineparts3d(lpa, aBlock, lpb, bBlock) {
