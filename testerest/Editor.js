@@ -932,7 +932,7 @@
 
                     mergeMatches(neighbourMatch, nextOLineName, matches);
 
-                    m0[m0oLineName] = neighbourMatch[nextOLineName];
+                    m0[m0oLineName] = translateLine(neighbourMatch[nextOLineName], neighbourMatch.block, m0.block);
                 }
 
                 function getNeighbour() {
