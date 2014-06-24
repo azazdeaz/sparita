@@ -105,14 +105,14 @@ define([
             material.dualTransparency = true;
             return material;
         })();
-        
+
         //make corner pickers
         this._cornerList.forEach(function (a, cidx) {
 
             var meshData = ShapeCreator.createSphere(8, 8, .32);
-            
+
             var entity = EntityUtils.createTypicalEntity(opt.goo.world, meshData);
-            
+
             box.transformComponent.attachChild(entity.transformComponent);
             entity.meshRendererComponent.materials.push(pickerMaterial);
 
@@ -143,7 +143,7 @@ define([
                 ab: ab,
                 cornerIdxList: ab
             }
-        }); 
+        });
 
         //make surface pickers
         [
@@ -157,7 +157,7 @@ define([
 
             var meshData = ShapeCreator.createQuad();
             var entity = EntityUtils.createTypicalEntity(opt.goo.world, meshData);
-            
+
             box.transformComponent.attachChild(entity.transformComponent);
             entity.meshRendererComponent.materials.push(pickerMaterial);
 
@@ -167,7 +167,7 @@ define([
                 abcd: abcd,
                 cornerIdxList: abcd
             }
-        }); 
+        });
 
         this._fitPickers();
         this.hidePickers();
@@ -199,7 +199,7 @@ define([
                 this._material.uniforms.materialAmbient = [Math.random(),Math.random(),Math.random(),Math.random()];
                 this._material.uniforms.materialDiffuse = [Math.random(),Math.random(),Math.random(),Math.random()];
                 break;
-            
+
             case 2:
                 this._material.uniforms.materialAmbient = [.4,.4,.5,.4];
                 this._material.uniforms.materialDiffuse = [.5,.5,1,.5];
@@ -215,7 +215,7 @@ define([
     p.selectPicker = function (pickerEntityId, mdx, mdy, onFinish) {
 
         $('.greenMarker').remove();
-        
+
         var that = this, picker, center2d, offsetList3d, targetList2d = [], cl = this._cornerList;
 
         if (!this._pickerDict.hasOwnProperty(pickerEntityId)) {
@@ -259,7 +259,7 @@ define([
             else {
                 offset[0] = mdx + (offset[0] / picker.cornerIdxList.length);
                 offset[1] = mdy + (offset[1] / picker.cornerIdxList.length);
-                
+
                 targetList2d.push(offset);
             }
 
@@ -283,7 +283,7 @@ define([
 
         function movePicker(e) {
 
-            var mx = e.clientX, 
+            var mx = e.clientX,
                 my = e.clientY,
                 dc = diff(mdx, mdy, mx, my),
                 mRad = Math.atan2(my-mdy, mx-mdx),
@@ -319,7 +319,7 @@ define([
             window.removeEventListener('mouseup', moveEnd);
 
             if (!noCallback) {
-                
+
                 if (onFinish) {
                     onFinish();
                 }
@@ -330,7 +330,7 @@ define([
 
             var dx = bx - ax, dy = by - ay;
 
-            return Math.abs(Math.sqrt(dx*dx + dy*dy)); 
+            return Math.abs(Math.sqrt(dx*dx + dy*dy));
         }
 
         function radDiff(r1, r2) {
@@ -347,7 +347,7 @@ define([
             this._pickerDict[i].entity.transformComponent.setUpdated(false)
         }
     }
-    
+
     p.hidePickers = function () {
 
         for (var i in this._pickerDict) {
@@ -357,9 +357,9 @@ define([
 
     p.getCornerList = function () {
 
-        return  this._cornerList; 
+        return  this._cornerList;
     }
-      
+
     p._moveCorner = function(cidx, v, noHistory) {
 
         if (!noHistory) {
@@ -388,7 +388,7 @@ define([
             setVertex(that._cornerList[cidx], that._ci2vp[cidx][1] * 3);
             setVertex(that._cornerList[cidx], that._ci2vp[cidx][2] * 3);
         });
-        
+
         this.entity.meshDataComponent.meshData.vertexData._dataNeedsRefresh = true;
 
         this._fitPickers();
@@ -406,15 +406,15 @@ define([
         var that = this, cl = that._cornerList;
 
         _.each(this._pickerDict, function (picker, id) {
-            
+
             var ax, ay, az, bx, by, bz, dx, dy, dz, va, vb, fx, fy, fz, meshData;
 
             switch (picker.type) {
 
                 case 'corner':
                     picker.entity.transformComponent.setTranslation(
-                        (picker.a[0] - that.opt.divX/2) * that.opt.sizeX, 
-                        (picker.a[1] - that.opt.divY/2) * that.opt.sizeY, 
+                        (picker.a[0] - that.opt.divX/2) * that.opt.sizeX,
+                        (picker.a[1] - that.opt.divY/2) * that.opt.sizeY,
                         (picker.a[2] - that.opt.divZ/2) * that.opt.sizeZ);
                     break;
 
@@ -430,10 +430,10 @@ define([
                     dz = bz - az;
                     va = new Vector3([ax, ay, az]);
                     vb = new Vector3([bx, by, bz]);
-                
+
                     picker.entity.transformComponent.setTranslation(
-                        ax + dx / 2, 
-                        ay + dy / 2, 
+                        ax + dx / 2,
+                        ay + dy / 2,
                         az + dz / 2);
 
                     picker.entity.transformComponent.setScale(1, 1, va.distance(vb)*.33);
@@ -473,13 +473,13 @@ define([
         var that = this;
         setInterval(function () {
             diff += .112;
-            position[p]   = basePos[0] + Math.sin(diff)*s; 
-            position[p+1] = basePos[1] + Math.sin(diff)*s; 
+            position[p]   = basePos[0] + Math.sin(diff)*s;
+            position[p+1] = basePos[1] + Math.sin(diff)*s;
             position[p+2] = basePos[2] + Math.sin(diff)*s;
-            that.entity.meshDataComponent.meshData.vertexData._dataNeedsRefresh = true; 
+            that.entity.meshDataComponent.meshData.vertexData._dataNeedsRefresh = true;
         }, 33);
 
-        // box.meshDataComponent.meshData.dataViews.POSITION[3] = 2
+        // box.meshDataComponent.meshData.dataViews.POSITION[3] = 2;
         // box.meshDataComponent.meshData.vertexData._dataNeedsRefresh = true;
     };
 
@@ -490,7 +490,7 @@ define([
         cidxList.forEach(function (cidx) {
 
             var corner = cl[cidx], n = that._neighbors[cidx], fm = [];
-            
+
             if (corner[0] > 0              && !hit(cidx, n[0] )) fm[0] = 1;
             if (corner[0] < that.opt.divX  && !hit(cidx, n[1] )) fm[1] = 1;
             if (corner[1] > 0              && !hit(cidx, n[2] )) fm[2] = 1;
@@ -513,8 +513,8 @@ define([
         function hit(aCidx, bCidx) {
 
             return bCidx !== -1 &&
-                ( cl[aCidx][0] === cl[bCidx][0] && 
-                   cl[aCidx][1] === cl[bCidx][1] && 
+                ( cl[aCidx][0] === cl[bCidx][0] &&
+                   cl[aCidx][1] === cl[bCidx][1] &&
                    cl[aCidx][2] === cl[bCidx][2]);
         }
 
@@ -523,7 +523,7 @@ define([
             for (var i = 0; i < freeMoveList.length; ++i) {
                 if(freeMoveList[i][wid] !== 1) {
                     return;
-                } 
+                }
             }
 
             ret.push([x, y, z])
@@ -554,12 +554,12 @@ define([
             (v[0] - this.opt.divX/2) * this.opt.sizeX,
             (v[1] - this.opt.divY/2) * this.opt.sizeY,
             (v[2] - this.opt.divZ/2) * this.opt.sizeZ);
-        
+
         this.opt.goo.world.process();
 
         var pos = camera.getScreenCoordinates(
             this._pointer3d.transformComponent.worldTransform.translation,
-            this.opt.goo.renderer.viewportWidth, 
+            this.opt.goo.renderer.viewportWidth,
             this.opt.goo.renderer.viewportHeight);
 
         // this.deMarker.style.left = pos.x + 'px';

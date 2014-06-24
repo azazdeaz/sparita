@@ -10,17 +10,14 @@ function Editor(model) {
     camera, scene, renderer, controls,
     projector, raycaster;
 
-  projector = new THREE.Projector();
-  raycaster = new THREE.Raycaster();
-
   this._renderW = 400;
   this._renderH = 300;
 
-  scene = new THREE.Scene({antialias: true});
+  this.scene = new THREE.Scene({antialias: true});
 
   camera = new THREE.PerspectiveCamera(45, this._renderW / this._renderH, .1, 1000);
   camera.position.z = 300;
-  scene.add(camera);
+  this.scene.add(camera);
 
   controls = new THREE.OrbitControls(camera);
   controls.addEventListener('change', render);
@@ -34,12 +31,10 @@ function Editor(model) {
   var pointLight = new THREE.PointLight(0xFFFFFF);
   pointLight.position.x = 310;
   pointLight.position.y = 250;
-  // pointLight.position.z = 0;
   camera.add(pointLight);
   pointLight = new THREE.PointLight(0xFFFFFF);
   pointLight.position.x = -310;
   pointLight.position.y = -250;
-  // pointLight.position.z = 400;
   camera.add(pointLight);
 
 
@@ -48,10 +43,11 @@ function Editor(model) {
       for (z = 0; z < model.div[2]; ++z) {
 
         var ediBox = new EdiBox(model.boxDiv, boxSize, renderer, camera);
-        scene.add(ediBox.mesh);
+        this.scene.add(ediBox.mesh);
         ediBox.mesh.position.x = (model.div[0] / -2 + x) * boxSize[0];
         ediBox.mesh.position.y = (model.div[1] / -2 + y) * boxSize[1];
         ediBox.mesh.position.z = (model.div[2] / -2 + z) * boxSize[2];
+        ediBox.onChange = render;
         ediBoxes.push(ediBox);
       }
     }
@@ -70,7 +66,7 @@ function Editor(model) {
 
     raycaster.set(camera.position, vector.sub(camera.position).normalize());
     var intersects = raycaster.intersectObjects(scene.children);
-    
+
     if (intersects.length) {
 
       ediBoxes.forEach(function (ediBox) {
@@ -87,7 +83,7 @@ function Editor(model) {
 
   function animate() {
 
-    requestAnimationFrame(animate);
+    this.animateRafId = requestAnimationFrame(animate);
     controls.update();
   }
 
@@ -100,12 +96,20 @@ function Editor(model) {
 var p = Editor.prototype;
 
 p.setSize = function(w, h) {
-  // this.camera.aspect = window.innerWidth / window.innerHeight;
-  // this.camera.updateProjectionMatrix();
 
-  // this.renderer.setSize( window.innerWidth, window.innerHeight );
+  this._renderW = w;
+  this._renderH = h;
+  this.camera.aspect = this._renderW / this._renderH;
+  this.camera.updateProjectionMatrix();
 
-  // this.render();
+  this.renderer.setSize(this._renderW, this._renderH);
+
+  this.render();
+}
+
+p.destroy = function () {
+
+  window.cancelAnimationFrame(this.animateRafId);
 }
 
 module.exports = Editor;
