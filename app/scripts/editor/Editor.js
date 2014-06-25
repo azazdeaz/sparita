@@ -8,7 +8,8 @@ function Editor(model) {
     x, y, z, ediBoxes = [],
     boxSize = [30, 30, 30],
     camera, scene, renderer, controls,
-    projector, raycaster;
+    projector, raycaster,
+    currEdiBox;
 
   this._renderW = 400;
   this._renderH = 300;
@@ -19,12 +20,13 @@ function Editor(model) {
   camera.position.z = 300;
   this.scene.add(camera);
 
-  controls = new THREE.OrbitControls(camera);
-  controls.addEventListener('change', render);
 
   this.renderer = renderer = new THREE.WebGLRenderer({alpha: false});
   renderer.setSize(this._renderW, this._renderH);
   this.domElement = renderer.domElement;
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.addEventListener('change', render);
 
   projector = new THREE.Projector();
   raycaster = new THREE.Raycaster();
@@ -80,7 +82,11 @@ function Editor(model) {
 
         if (intersects[0].object === ediBox.mesh) {
 
-          ediBox.showHandlers();
+          if (currEdiBox) {
+            currEdiBox.hideHandlers();
+          }
+          currEdiBox = ediBox;
+          currEdiBox.showHandlers();
         }
       });
     }

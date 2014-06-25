@@ -68,6 +68,14 @@ p.showHandlers = function() {
   });
 };
 
+p.hideHandlers = function() {
+
+  this.handlers.forEach(function(handler) {
+
+    handler.hide();
+  });
+};
+
 p._fitHandlers = function () {
 
   this.handlers.forEach(function (handler) {
@@ -82,7 +90,7 @@ p.createCornerHandler = function(corner) {
 
   var de = createCornerHandlerCircle();
   de.onmousedown = function (e) {
-    that.selectHandler(handler, e.pageY, e.pageX);
+    that.selectHandler(handler, e.pageX, e.pageY);
   };
 
   var handler = {
@@ -97,11 +105,19 @@ p.createCornerHandler = function(corner) {
     that.renderer.domElement.parentNode.appendChild(de);
   };
 
+  handler.hide = function() {
+
+  	if (de.parentNode) {
+
+  		de.parentNode.removeChild(de);
+  	}
+  };
+
   handler.fit = function () {
 
     var pos = that._vertexTo2d(that._cornerToVertex(corner));
-    de.style.left = pos.x + 'px';
-    de.style.top = pos.y + 'px';
+    de.style.left = pos[0] + 'px';
+    de.style.top = pos[1] + 'px';
   };
 
   return handler;
@@ -191,11 +207,11 @@ p.selectHandler = function (handler, mdx, mdy, onFinish) {
       if (diff(target2d[0], target2d[1], mx, my) < dc) {
           moveEnd(true);
 
-          picker.corners.forEach(function (corner) {
+          handler.corners.forEach(function (corner) {
               that._moveCorner(corner, offsetList3d[targetIdx]);
           });
 
-          that.selectPicker(pickerEntityId, target2d[0], target2d[1], onFinish);
+          that.selectHandler(handler, target2d[0], target2d[1], onFinish);
       }
   }
 
@@ -228,12 +244,12 @@ p.selectHandler = function (handler, mdx, mdy, onFinish) {
 
 p._moveCorner = function(corner, offset, noHistory) {
 
-  if (!noHistory) {
-    this.opt.saveHistory({
-      undo: [this._moveCorner, this, corner, offset.map(function (n) {return -n}), true],
-      redo: [this._moveCorner, this, corner, offset, true],
-    });
-  }
+  // if (!noHistory) {
+  //   this._recordHistory({
+  //     undo: [this._moveCorner, this, corner, offset.map(function (n) {return -n}), true],
+  //     redo: [this._moveCorner, this, corner, offset, true],
+  //   });
+  // }
 
   corner[0] += offset[0];
   corner[1] += offset[1];
@@ -269,10 +285,10 @@ p._vertexTo2d = (function() {
 
     var vector2d = projector.projectVector(vector, this.camera);
 
-    return {
-      x: Math.round((1 + vector2d.x) * (this.renderer.domElement.width / 2)),
-      y: Math.round((1 - vector2d.y) * (this.renderer.domElement.height / 2))
-    };
+    return [
+      Math.round((1 + vector2d.x) * (this.renderer.domElement.width / 2)),
+      Math.round((1 - vector2d.y) * (this.renderer.domElement.height / 2))
+    ];
   };
 }());
 
