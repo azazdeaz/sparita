@@ -72,7 +72,7 @@ gulp.task('scripts', function () {
       //       }
       //     }
       // },
-      // Note: At this time it seems that you will also have to 
+      // Note: At this time it seems that you will also have to
       // setup browserify-shims in package.json to correctly handle
       // the exclusion of vendor vendor libraries from your bundle
       // external: ['lodash', 'jQuery', 'foundation'],
@@ -164,7 +164,7 @@ gulp.task('watch', ['connect'], function () {
 
     // Watch .scss files
     gulp.watch('app/scss/**/*.scss', ['styles']);
-    
+
 
     // Watch .js files
     gulp.watch(['app/templates/**/*.html', 'app/scripts/**/*.js'], ['scripts']);
@@ -172,7 +172,7 @@ gulp.task('watch', ['connect'], function () {
     // Watch image files
     gulp.watch('app/images/**/*', ['images']);
 
-    
+
     // Watch .html files
     gulp.watch('app/**/*.html', ['html']);
 });

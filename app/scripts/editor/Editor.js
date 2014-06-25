@@ -13,20 +13,21 @@ function Editor(model) {
   this._renderW = 400;
   this._renderH = 300;
 
-  this.scene = new THREE.Scene({antialias: true});
+  this.scene = scene = new THREE.Scene({antialias: true});
 
-  camera = new THREE.PerspectiveCamera(45, this._renderW / this._renderH, .1, 1000);
+  this.camera = camera = new THREE.PerspectiveCamera(45, this._renderW / this._renderH, 0.1, 1000);
   camera.position.z = 300;
   this.scene.add(camera);
 
   controls = new THREE.OrbitControls(camera);
   controls.addEventListener('change', render);
 
-  renderer = new THREE.WebGLRenderer({
-    alpha: false
-  });
+  this.renderer = renderer = new THREE.WebGLRenderer({alpha: false});
   renderer.setSize(this._renderW, this._renderH);
   this.domElement = renderer.domElement;
+
+  projector = new THREE.Projector();
+  raycaster = new THREE.Raycaster();
 
   var pointLight = new THREE.PointLight(0xFFFFFF);
   pointLight.position.x = 310;
@@ -42,7 +43,13 @@ function Editor(model) {
     for (y = 0; y < model.div[1]; ++y) {
       for (z = 0; z < model.div[2]; ++z) {
 
-        var ediBox = new EdiBox(model.boxDiv, boxSize, renderer, camera);
+        var ediBox = new EdiBox({
+          div: model.boxDiv,
+          size: boxSize,
+          renderer: renderer,
+          camera: camera,
+          recordHistory: this.recordHistory.bind(this)
+        });
         this.scene.add(ediBox.mesh);
         ediBox.mesh.position.x = (model.div[0] / -2 + x) * boxSize[0];
         ediBox.mesh.position.y = (model.div[1] / -2 + y) * boxSize[1];
@@ -56,16 +63,16 @@ function Editor(model) {
   renderer.domElement.addEventListener('click', function(e) {
 
     var mx = e.hasOwnProperty('offsetX') ? e.offsetX : e.layerX,
-      my = e.hasOwnProperty('offsetY') ? e.offsetY : e.layerY,
+      my = e.hasOwnProperty('offsetY') ? e.offsetY : e.layerY;
 
-    mx = (mx / that._renderW) * 2 - 1
-    my = (my / that._renderH) * -2 + 1
+    mx = (mx / that._renderW) * 2 - 1;
+    my = (my / that._renderH) * -2 + 1;
 
     var vector = new THREE.Vector3(mx, my, 1);
     projector.unprojectVector(vector, camera);
 
     raycaster.set(camera.position, vector.sub(camera.position).normalize());
-    var intersects = raycaster.intersectObjects(scene.children);
+    var intersects = raycaster.intersectObjects(that.scene.children);
 
     if (intersects.length) {
 
@@ -75,11 +82,11 @@ function Editor(model) {
 
           ediBox.showHandlers();
         }
-      })
+      });
     }
   });
 
-  renderer.render(scene, camera);
+  renderer.render(this.scene, camera);
 
   function animate() {
 
@@ -89,7 +96,7 @@ function Editor(model) {
 
   function render() {
 
-    renderer.render(scene, camera);
+    renderer.render(that.scene, camera);
   }
 }
 
@@ -104,12 +111,61 @@ p.setSize = function(w, h) {
 
   this.renderer.setSize(this._renderW, this._renderH);
 
-  this.render();
-}
+  // this.render();
+};
+
+
+
+//history
+p.undo = function () {
+
+  if (this._historyPointer > 0) {
+
+    --this._historyPointer;
+    var f = this._history[this._historyPointer].undo;
+    f[0].apply(f[1], f.slice(2));
+
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+
+p.redo = function () {
+
+  if (this._historyPointer < this._history.length) {
+
+    var f = this._history[this._historyPointer].redo;
+    f[0].apply(f[1], f.slice(2));
+
+    ++this._historyPointer;
+
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+
+p.recordHistory = function (reg) {
+
+  if (this._historyPointer < this._history.length) {
+    this._history = this._history.splice(0, this._historyPointer);
+  }
+
+  this._history.push(reg);
+  this._historyPointer = this._history.length;
+};
+
+
+
 
 p.destroy = function () {
 
   window.cancelAnimationFrame(this.animateRafId);
-}
+};
+
+
 
 module.exports = Editor;
