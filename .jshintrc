@@ -18,6 +18,7 @@
     "trailing": true,
     "smarttabs": true,
     "white": false,
+    "latedef": false,
     "predef": [
         "THREE",
         "$",

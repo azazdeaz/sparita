@@ -33,12 +33,13 @@
       "browserify-shim"
     ]
   },
-  "browser": {
-  },
+  "browser": {},
   "browserify-shim": {
     "lodash": "global:lodash",
     "jquery": "global:jQuery",
     "foundation": "global:jQuery.fn.foundation"
   },
-  "dependencies": {}
+  "dependencies": {
+    "domready": "^1.0.5"
+  }
 }

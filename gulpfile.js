@@ -29,7 +29,8 @@ gulp.task('vendor', function () {
       bower + '/threejs/build/three.js',
       bower + '/threex-controls/controls/OrbitControls.js',
       bower + '/jquery/dist/jquery.js',
-      bower + '/foundation/js/foundation.js'
+      bower + '/foundation/js/foundation.js',
+      bower + '/velocity/jquery.velocity.js'
     ])
     // .pipe($.browserify({
     //   debug: true,

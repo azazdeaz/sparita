@@ -6,7 +6,11 @@ function EdiBox(opt) {
   this._size = opt.size;
   this.renderer = opt.renderer;
   this.camera = opt.camera;
+  this.render = opt.render;
   this.recordHistory = opt.recordHistory;
+
+  var geometry = new THREE.Geometry();
+  geometry.dynamic = true;
 
   this._cornerList = [
     [0, 0, 0],
@@ -17,13 +21,20 @@ function EdiBox(opt) {
     [1, 1, 0],
     [1, 1, 1],
     [0, 1, 1]
-  ].map(function (vertex) {
+  ].map(function (corner) {
 
-    vertex[0] *= this._div[0];
-    vertex[1] *= this._div[1];
-    vertex[2] *= this._div[2];
+    geometry.vertices.push(new THREE.Vector3(
+      (corner[0] - 0.5) * this._size[0],
+      (corner[1] - 0.5) * this._size[1],
+      (corner[2] - 0.5) * this._size[2]
+    ));
 
-    return vertex;
+    corner[0] *= this._div[0];
+    corner[1] *= this._div[1];
+    corner[2] *= this._div[2];
+
+    return corner;
+
   }, this);
 
   this._neighbors = [
@@ -37,14 +48,30 @@ function EdiBox(opt) {
     [-1,  6,  3, -1,  4, -1]
   ];
 
-  this.mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(this._size[0], this._size[1], this._size[2]),
-    new THREE.MeshLambertMaterial({
-      color: 0x0000FF
-    })
-  );
+  geometry.faces.push(new THREE.Face3(0, 1, 2));
+  geometry.faces.push(new THREE.Face3(2, 3, 0));
+  geometry.faces.push(new THREE.Face3(4, 5, 1));
+  geometry.faces.push(new THREE.Face3(1, 0, 4));
+  geometry.faces.push(new THREE.Face3(6, 5, 1));
+  geometry.faces.push(new THREE.Face3(1, 2, 6));
+  geometry.faces.push(new THREE.Face3(7, 4, 0));
+  geometry.faces.push(new THREE.Face3(0, 3, 7));
+  geometry.faces.push(new THREE.Face3(7, 6, 2));
+  geometry.faces.push(new THREE.Face3(2, 3, 7));
+  geometry.faces.push(new THREE.Face3(4, 5, 6));
+  geometry.faces.push(new THREE.Face3(6, 7, 4));
 
-  this.mesh.geometry.dynamic = true;
+  // geometry.computeCentroids();
+  geometry.computeFaceNormals();
+  geometry.computeVertexNormals();
+
+  // geometry = new THREE.BoxGeometry(20, 20, 20);
+  var material = new THREE.MeshLambertMaterial({wireframe: false,color: 0x0000FF});
+  // var material = new THREE.MeshBasicMaterial({wireframe: true,color: 'blue'});
+  material.side = THREE.DoubleSide
+
+  this.mesh = new THREE.Mesh(geometry, material);
+
 
   this.handlers = [
     this.createCornerHandler(this._cornerList[0]),
@@ -54,7 +81,19 @@ function EdiBox(opt) {
     this.createCornerHandler(this._cornerList[4]),
     this.createCornerHandler(this._cornerList[5]),
     this.createCornerHandler(this._cornerList[6]),
-    this.createCornerHandler(this._cornerList[7])
+    this.createCornerHandler(this._cornerList[7]),
+    this.createEdgeHandler(this._cornerList[0], this._cornerList[1]),
+    this.createEdgeHandler(this._cornerList[1], this._cornerList[2]),
+    this.createEdgeHandler(this._cornerList[2], this._cornerList[3]),
+    this.createEdgeHandler(this._cornerList[3], this._cornerList[0]),
+    this.createEdgeHandler(this._cornerList[4], this._cornerList[5]),
+    this.createEdgeHandler(this._cornerList[5], this._cornerList[6]),
+    this.createEdgeHandler(this._cornerList[6], this._cornerList[7]),
+    this.createEdgeHandler(this._cornerList[7], this._cornerList[4]),
+    this.createEdgeHandler(this._cornerList[0], this._cornerList[4]),
+    this.createEdgeHandler(this._cornerList[1], this._cornerList[5]),
+    this.createEdgeHandler(this._cornerList[2], this._cornerList[6]),
+    this.createEdgeHandler(this._cornerList[3], this._cornerList[7])
   ];
 }
 
@@ -123,9 +162,52 @@ p.createCornerHandler = function(corner) {
   return handler;
 };
 
+p.createEdgeHandler = function(cornerA, cornerB) {
+
+  var that = this;
+
+  var de = createEdgeHandlerLine();
+  de.onmousedown = function (e) {
+    that.selectHandler(handler, e.pageX, e.pageY);
+  };
+
+  var handler = {
+    domElement: de,
+    corners: [cornerA, cornerB]
+  };
+
+  handler.show = function() {
+
+    handler.fit();
+    de.style.visibility = 'visible';
+    that.renderer.domElement.parentNode.appendChild(de);
+  };
+
+  handler.hide = function() {
+
+    if (de.parentNode) {
+
+      de.parentNode.removeChild(de);
+    }
+  };
+
+  handler.fit = function () {
+
+    var posA = that._vertexTo2d(that._cornerToVertex(cornerA)),
+      posB = that._vertexTo2d(that._cornerToVertex(cornerB)),
+      rad = Math.atan2(posA[1] - posB[1], posA[0] - posB[0]);
+
+    de.style.left = posA[0] + 'px';
+    de.style.top = posB[1] + 'px';
+    $(de).css('transform', 'rotate('+rad+'rad)');
+  };
+
+  return handler;
+};
+
 p.selectHandler = function (handler, mdx, mdy, onFinish) {
 
-  var that = this, picker, offsetList3d, targetList2d = [], cl = this._cornerList;
+  var that = this, offsetList3d, targetList2d = [];
 
   offsetList3d = this._getTargetPositions(handler.corners);
 
@@ -244,12 +326,12 @@ p.selectHandler = function (handler, mdx, mdy, onFinish) {
 
 p._moveCorner = function(corner, offset, noHistory) {
 
-  // if (!noHistory) {
-  //   this._recordHistory({
-  //     undo: [this._moveCorner, this, corner, offset.map(function (n) {return -n}), true],
-  //     redo: [this._moveCorner, this, corner, offset, true],
-  //   });
-  // }
+  if (!noHistory) {
+    // this._recordHistory({
+    //   undo: [this._moveCorner, this, corner, offset.map(function (n) {return -n}), true],
+    //   redo: [this._moveCorner, this, corner, offset, true],
+    // });
+  }
 
   corner[0] += offset[0];
   corner[1] += offset[1];
@@ -268,6 +350,7 @@ p.refreshMesh = function () {
   this.mesh.geometry.verticesNeedUpdate = true;
   this.mesh.geometry.normalsNeedUpdate = true;
 
+  this.render();
   this._fitHandlers();
 };
 
@@ -349,6 +432,11 @@ p._getTargetPositions = function (movingCorners) {
   }
 };
 
+p.getCornerList = function () {
+
+  return this.cornerList.slice().map(function (corner) {return corner.slice();});
+};
+
 module.exports = EdiBox;
 
 
@@ -359,28 +447,53 @@ module.exports = EdiBox;
 
 
 
-function createDebugPixel() {
 
-  var de = document.createElement('div');
-  de.style.position = 'absolute';
-  de.style.width = '3px';
-  de.style.height = '3px';
-  de.style.backgroundColor = 'red';
-  de.style.visibility = 'hidden';
+// function createDebugPixel() {
 
-  return de;
-}
+//   var de = document.createElement('div');
+//   de.style.position = 'absolute';
+//   de.style.width = '3px';
+//   de.style.height = '3px';
+//   de.style.backgroundColor = 'red';
+//   de.style.visibility = 'hidden';
+
+//   return de;
+// }
 
 function createCornerHandlerCircle() {
 
-  var de = document.createElement('div');
-  de.style.position = 'absolute';
-  de.style.width = '12px';
-  de.style.height = '12px';
-  de.style.backgroundRadius = '6px';
-  de.style.backgroundColor = 'red';
-  de.style.visibility = 'hidden';
-  de.style.cursor = 'pointer';
+  var size = 18, half = size/2;
 
-  return de;
+  var cont = document.createElement('div');
+  cont.style.position = 'absolute';
+  var circ = document.createElement('div');
+  cont.appendChild(circ);
+  circ.style.position = 'absolute';
+  circ.style.left = (-half) + 'px';
+  circ.style.top = (-half) + 'px';
+  circ.style.width = size + 'px';
+  circ.style.height = size + 'px';
+  circ.style.borderRadius = half + 'px';
+  circ.style.backgroundColor = 'red';
+  circ.style.cursor = 'pointer';
+
+  return cont;
+}
+
+function createEdgeHandlerLine() {
+
+  var size = 4, half = size/2;
+
+  var cont = document.createElement('div');
+  cont.style.position = 'absolute';
+  var line = document.createElement('div');
+  cont.appendChild(line);
+  line.style.position = 'absolute';
+  line.style.top = (-half) + 'px';
+  line.style.width = '100px';
+  line.style.height = size + 'px';
+  line.style.backgroundColor = 'red';
+  line.style.cursor = 'pointer';
+
+  return cont;
 }

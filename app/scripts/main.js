@@ -8,11 +8,14 @@
 'use strict';
 
 var pager = require('./pager.js'),
-	$ = require('jquery'),
+	domReady = require('domReady'),
 	foundation = require('foundation');
 
-pager.open('gamepage');
+domReady(function () {
 
-$('nav #menu').click(pager.open.bind(null, 'menu'));
+    pager.open('gamepage');
 
-$(document).foundation();
+    $('nav #menu').click(pager.open.bind(null, 'menu'));
+
+    $(document).foundation();
+})
