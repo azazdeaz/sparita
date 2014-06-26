@@ -8,7 +8,7 @@
 'use strict';
 
 var pager = require('./pager.js'),
-	domReady = require('domReady'),
+	domReady = require('domready'),
 	foundation = require('foundation');
 
 domReady(function () {

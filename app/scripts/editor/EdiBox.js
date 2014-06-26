@@ -195,10 +195,10 @@ p.createEdgeHandler = function(cornerA, cornerB) {
 
     var posA = that._vertexTo2d(that._cornerToVertex(cornerA)),
       posB = that._vertexTo2d(that._cornerToVertex(cornerB)),
-      rad = Math.atan2(posA[1] - posB[1], posA[0] - posB[0]);
+      rad = Math.atan2(posB[1] - posA[1], posB[0] - posA[0]);
 
     de.style.left = posA[0] + 'px';
-    de.style.top = posB[1] + 'px';
+    de.style.top = posA[1] + 'px';
     $(de).css('transform', 'rotate('+rad+'rad)');
   };
 
@@ -486,6 +486,9 @@ function createEdgeHandlerLine() {
 
   var cont = document.createElement('div');
   cont.style.position = 'absolute';
+  cont.style.width = '6px';
+  cont.style.height = '6px';
+  cont.style.backgroundColor = 'green';
   var line = document.createElement('div');
   cont.appendChild(line);
   line.style.position = 'absolute';

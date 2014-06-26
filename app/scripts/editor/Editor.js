@@ -1,7 +1,7 @@
 'use strict';
 
-var EdiBox = require('./EdiBox'),
-  calcBlueprint = require('./calcBlueprint');
+var EdiBox = require('./EdiBox');
+  // calcBlueprint = require('./calcBlueprint');
 
 function Editor(model) {
 
