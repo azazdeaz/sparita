@@ -24,14 +24,14 @@ function EdiBox(opt) {
   ].map(function (corner) {
 
     geometry.vertices.push(new THREE.Vector3(
-      (corner[0] - 0.5) * this._size[0],
-      (corner[1] - 0.5) * this._size[1],
-      (corner[2] - 0.5) * this._size[2]
+      (corner[0] - 0.5) * this._size.x,
+      (corner[1] - 0.5) * this._size.y,
+      (corner[2] - 0.5) * this._size.z
     ));
 
-    corner[0] *= this._div[0];
-    corner[1] *= this._div[1];
-    corner[2] *= this._div[2];
+    corner[0] *= this._div.x;
+    corner[1] *= this._div.y;
+    corner[2] *= this._div.z;
 
     return corner;
 
@@ -195,10 +195,14 @@ p.createEdgeHandler = function(cornerA, cornerB) {
 
     var posA = that._vertexTo2d(that._cornerToVertex(cornerA)),
       posB = that._vertexTo2d(that._cornerToVertex(cornerB)),
-      rad = Math.atan2(posB[1] - posA[1], posB[0] - posA[0]);
+      dx = posB[0] - posA[0],
+      dy = posB[1] - posA[1],
+      rad = Math.atan2(dy, dx),
+      width = Math.sqrt(dx*dx + dy*dy);
 
     de.style.left = posA[0] + 'px';
     de.style.top = posA[1] + 'px';
+    de.style.wifth = width + 'px';
     $(de).css('transform', 'rotate('+rad+'rad)');
   };
 
@@ -379,9 +383,9 @@ p._cornerToVertex = function (corner, vertex) {
 
   vertex = vertex || new THREE.Vector3();
 
-  vertex.x = (corner[0] * (this._size[0] / this._div[0])) - (this._size[0] / 2);
-  vertex.y = (corner[1] * (this._size[1] / this._div[1])) - (this._size[1] / 2);
-  vertex.z = (corner[2] * (this._size[2] / this._div[2])) - (this._size[2] / 2);
+  vertex.x = (corner[0] * (this._size.x / this._div.x)) - (this._size.x / 2);
+  vertex.y = (corner[1] * (this._size.y / this._div.y)) - (this._size.y / 2);
+  vertex.z = (corner[2] * (this._size.z / this._div.z)) - (this._size.z / 2);
 
   return vertex;
 };
@@ -394,12 +398,12 @@ p._getTargetPositions = function (movingCorners) {
 
     var cidx = cl.indexOf(corner), n = this._neighbors[cidx], fm = [];
 
-    if (corner[0] > 0            && n[0] !== -1 && !hit(corner, cl[n[0]])) {fm[0] = 1;}
-    if (corner[0] < this._div[0] && n[1] !== -1 && !hit(corner, cl[n[1]])) {fm[1] = 1;}
-    if (corner[1] > 0            && n[2] !== -1 && !hit(corner, cl[n[2]])) {fm[2] = 1;}
-    if (corner[1] < this._div[1] && n[3] !== -1 && !hit(corner, cl[n[3]])) {fm[3] = 1;}
-    if (corner[2] > 0            && n[4] !== -1 && !hit(corner, cl[n[4]])) {fm[4] = 1;}
-    if (corner[2] < this._div[2] && n[5] !== -1 && !hit(corner, cl[n[5]])) {fm[5] = 1;}
+    if (corner[0] > 0           && n[0] !== -1 && !hit(corner, cl[n[0]])) {fm[0] = 1;}
+    if (corner[0] < this._div.x && n[1] !== -1 && !hit(corner, cl[n[1]])) {fm[1] = 1;}
+    if (corner[1] > 0           && n[2] !== -1 && !hit(corner, cl[n[2]])) {fm[2] = 1;}
+    if (corner[1] < this._div.y && n[3] !== -1 && !hit(corner, cl[n[3]])) {fm[3] = 1;}
+    if (corner[2] > 0           && n[4] !== -1 && !hit(corner, cl[n[4]])) {fm[4] = 1;}
+    if (corner[2] < this._div.z && n[5] !== -1 && !hit(corner, cl[n[5]])) {fm[5] = 1;}
 
     freeMoveList.push(fm);
   }, this);

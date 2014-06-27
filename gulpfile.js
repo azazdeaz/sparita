@@ -25,7 +25,7 @@ gulp.task('styles', function () {
 // Vendor
 gulp.task('vendor', function () {
   return gulp.src([
-      // bower + '/lodash/dist/lodash.js',
+      bower + '/lodash/dist/lodash.js',
       bower + '/threejs/build/three.js',
       bower + '/threex-controls/controls/OrbitControls.js',
       bower + '/jquery/dist/jquery.js',

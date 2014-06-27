@@ -7,7 +7,7 @@ function Editor(model) {
 
   var that = this,
     x, y, z, ediBoxes = [],
-    boxSize = [30, 30, 30],
+    boxSize = {x: 30, y: 30, z: 30},
     camera, scene, renderer, controls,
     projector, raycaster,
     currEdiBox;
@@ -29,7 +29,14 @@ function Editor(model) {
   this.domElement = renderer.domElement;
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.addEventListener('change', this.render.bind(this));
+  controls.addEventListener('change', function () {
+
+    this.render();
+
+    if (currEdiBox) {
+      currEdiBox.fitHandlers();
+    }
+  }.bind(this));
 
   projector = new THREE.Projector();
   raycaster = new THREE.Raycaster();
@@ -44,9 +51,9 @@ function Editor(model) {
   camera.add(pointLight);
 
 
-  for (x = 0; x < model.div[0]; ++x) {
-    for (y = 0; y < model.div[1]; ++y) {
-      for (z = 0; z < model.div[2]; ++z) {
+  for (x = 0; x < model.div.x; ++x) {
+    for (y = 0; y < model.div.y; ++y) {
+      for (z = 0; z < model.div.z; ++z) {
 
         var ediBox = new EdiBox({
           div: model.boxDiv,
@@ -57,9 +64,9 @@ function Editor(model) {
           recordHistory: this.recordHistory.bind(this)
         });
         this.scene.add(ediBox.mesh);
-        ediBox.mesh.position.x = (((model.div[0]-1) / -2) + x) * boxSize[0];
-        ediBox.mesh.position.y = (((model.div[1]-1) / -2) + y) * boxSize[1];
-        ediBox.mesh.position.z = (((model.div[2]-1) / -2) + z) * boxSize[2];
+        ediBox.mesh.position.x = (((model.div.x-1) / -2) + x) * boxSize.x;
+        ediBox.mesh.position.y = (((model.div.y-1) / -2) + y) * boxSize.y;
+        ediBox.mesh.position.z = (((model.div.z-1) / -2) + z) * boxSize.z;
         ediBox.onChange = this.render.bind(this);
         ediBoxes.push(ediBox);
       }
@@ -97,6 +104,15 @@ function Editor(model) {
   });
 
   this.render();
+
+  window.blueprint = function () {
+    setTimeout(function () {
+      var model = that.getModel();
+      var bp = calcBlueprint(model);
+      var img = renderBlueprint(bp);
+      console.log(bp);
+    }, 0;);
+  }
 }
 
 var p = Editor.prototype;
@@ -120,25 +136,25 @@ p.setSize = function(w, h) {
 
 p.getModel = function () {
 
-  var model = [];
+  var model = {geometry: []};
 
   this.ediBoxes.forEach(function (bx, x) {
 
-    model.push([]);
+    model.geometry.push([]);
 
     bx.forEach(function (by, y) {
 
-      model[x].push([]);
+      model.geometry[x].push([]);
 
       by.forEach(function (bz, z) {
 
-        model[x][y][z] = bz.getCornerList();
+        model.geometry[x][y].push(bz.getCornerList());
       });
     });
   });
 
-  model.div = this.initModel.div.slice();
-  model.boxDiv = this.initModel.boxDiv.slice();
+  model.divX = _.clone(this.initModel.div);
+  model.boxDiv = _.clone(this.initModel.boxDiv);
 
   return model;
 };
