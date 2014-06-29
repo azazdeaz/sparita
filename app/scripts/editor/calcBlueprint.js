@@ -5,7 +5,7 @@ function calcBlueprint(model, side, name) {
 
     glog.clear();//debug
 
-    var oMap, i, j, eMap = [], lineList = [], dashedList = [],
+    var oMap, i, j, eMap = [], lineList = [], dashedList = [], ret,
         surfaceVidxList = [
             [0, 1, 2, 3],
             [4, 5, 6, 7],
@@ -18,18 +18,19 @@ function calcBlueprint(model, side, name) {
             [0, 1], [1, 2], [2, 3], [3, 0],
             [0, 4], [1, 5], [2, 6], [3, 7],
             [4, 5], [5, 6], [6, 7], [7, 4]
-        ],
-        ret = {
-            name: name || 'test',
-            divX: oMap.div.x * oMap.boxDiv.x,
-            divY: oMap.div.y * oMap.boxDiv.y,
-            continuous: [],
-            dashed: []
-        };
+        ];
 
     oMap = model.geometry;
     oMap.div = model.div;
     oMap.boxDiv = model.boxDiv;
+
+    ret = {
+        name: name || 'test',
+        divX: oMap.div.x * oMap.boxDiv.x,
+        divY: oMap.div.y * oMap.boxDiv.y,
+        continuous: [],
+        dashed: []
+    }
 
     // oMap = this._transformModel(oMap, 'x');
     var blockId = 0; //debug
@@ -906,7 +907,7 @@ function calcBlueprint(model, side, name) {
             }
         }
     }
-});
+};
 
 
 //utils
@@ -1128,7 +1129,7 @@ var glog = (function () {
             zIndex: '99999',
             pointerEvents: 'none'
         })
-        .appendTo('body');
+        // .appendTo('body');
 
     var glog = {
 

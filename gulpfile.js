@@ -57,7 +57,7 @@ gulp.task('scripts', function () {
       debug: true,
       transform: [
         'browserify-shim',
-        'brfs',
+        'brfs', 
         // 'debowerify'
       ],
       // shim: {

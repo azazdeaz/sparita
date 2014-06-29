@@ -1,16 +1,18 @@
 'use strict';
 
-var EdiBox = require('./EdiBox');
-  // calcBlueprint = require('./calcBlueprint');
+var EdiBox = require('./EdiBox'),
+  calcBlueprint = require('./calcBlueprint');
 
 function Editor(model) {
 
   var that = this,
-    x, y, z, ediBoxes = [],
+    x, y, z,
     boxSize = {x: 30, y: 30, z: 30},
     camera, scene, renderer, controls,
     projector, raycaster,
     currEdiBox;
+
+  this.ediBoxes = [];
 
   this._renderW = 400;
   this._renderH = 300;
@@ -27,7 +29,7 @@ function Editor(model) {
   this.renderer = renderer = new THREE.WebGLRenderer({alpha: false});
   renderer.setSize(this._renderW, this._renderH);
   this.domElement = renderer.domElement;
-
+  
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.addEventListener('change', function () {
 
@@ -63,12 +65,13 @@ function Editor(model) {
           render: this.render.bind(this),
           recordHistory: this.recordHistory.bind(this)
         });
+        ediBox.position = {x: x, y: y, z: z};
         this.scene.add(ediBox.mesh);
         ediBox.mesh.position.x = (((model.div.x-1) / -2) + x) * boxSize.x;
         ediBox.mesh.position.y = (((model.div.y-1) / -2) + y) * boxSize.y;
         ediBox.mesh.position.z = (((model.div.z-1) / -2) + z) * boxSize.z;
         ediBox.onChange = this.render.bind(this);
-        ediBoxes.push(ediBox);
+        this.ediBoxes.push(ediBox);
       }
     }
   }
@@ -89,7 +92,7 @@ function Editor(model) {
 
     if (intersects.length) {
 
-      ediBoxes.forEach(function (ediBox) {
+      that.ediBoxes.forEach(function (ediBox) {
 
         if (intersects[0].object === ediBox.mesh) {
 
@@ -104,21 +107,22 @@ function Editor(model) {
   });
 
   this.render();
+  window.render = this.render.bind(this);
 
   window.blueprint = function () {
     setTimeout(function () {
       var model = that.getModel();
       var bp = calcBlueprint(model);
-      var img = renderBlueprint(bp);
-      console.log(bp);
-    }, 0;);
+      var img = renderBlueprint(bp, 234, 234);
+      $('body').append(img);
+      console.log(img.get(0));
+    }, 0);
   }
 }
 
 var p = Editor.prototype;
 
 p.render = function () {
-console.log('render')
   this.renderer.render(this.scene, this.camera);
 };
 
@@ -138,26 +142,41 @@ p.getModel = function () {
 
   var model = {geometry: []};
 
-  this.ediBoxes.forEach(function (bx, x) {
+  for (var x = 0; x < this.initModel.div.x; ++x) {
 
     model.geometry.push([]);
-
-    bx.forEach(function (by, y) {
-
+    
+    for (var y = 0; y < this.initModel.div.y; ++y) {
+    
       model.geometry[x].push([]);
 
-      by.forEach(function (bz, z) {
+      for (var z = 0; z < this.initModel.div.z; ++z) {
+        
+        var ediBox = this._getEdiboxByPosition({x: x, y: y, z: z});
+        model.geometry[x][y].push(ediBox.getCornerList());
+      }
+    }
+  }
 
-        model.geometry[x][y].push(bz.getCornerList());
-      });
-    });
-  });
-
-  model.divX = _.clone(this.initModel.div);
+  model.div = _.clone(this.initModel.div);
   model.boxDiv = _.clone(this.initModel.boxDiv);
 
   return model;
 };
+
+p._getEdiboxByPosition = function (pos) {
+
+  var ret;
+  return this.ediBoxes.find(function (ediBox) {
+
+    if (ediBox.position.x === pos.x ||
+      ediBox.position.y === pos.y ||
+      ediBox.position.z === pos.z)
+    {
+      return true;
+    }
+  });
+}
 
 
 
@@ -263,29 +282,29 @@ function renderBlueprint(wire, w, h) {
   ctx.stroke();
 
   var $name = $('<div>')
-      .css({
-          position: 'absolute',
-          fontFamily: 'Arvo, serif',
-          fontWeight: 700,
-          fontSize: '32px',
-          color: '#fff',
-          textAlign: 'center',
-          opacity: 0,
-          left: 15,
-          top: 12,
-          // backgroundColor: 'rgba(0, 0, 0, .43)'
-      })
-      .text(wire.name)
-      .addClass('name');
+    .css({
+      position: 'absolute',
+      fontFamily: 'Arvo, serif',
+      fontWeight: 700,
+      fontSize: '32px',
+      color: '#fff',
+      textAlign: 'center',
+      opacity: 0,
+      left: 15,
+      top: 12,
+      // backgroundColor: 'rgba(0, 0, 0, .43)'
+    })
+    .text(wire.name)
+    .addClass('name');
 
   var $cont = $('<div>')
-      .css({
-          position: 'absolute',
-          width: w,
-          height: h
-      })
-      .addClass('wire')
-      .append(c, $name);
+    .css({
+      position: 'absolute',
+      width: w,
+      height: h
+    })
+    .addClass('wire')
+    .append(c, $name);
 
   $cont.width = w;
   $cont.height = h;

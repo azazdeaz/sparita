@@ -115,7 +115,7 @@ p.hideHandlers = function() {
   });
 };
 
-p._fitHandlers = function () {
+p.fitHandlers = function () {
 
   this.handlers.forEach(function (handler) {
 
@@ -202,7 +202,7 @@ p.createEdgeHandler = function(cornerA, cornerB) {
 
     de.style.left = posA[0] + 'px';
     de.style.top = posA[1] + 'px';
-    de.style.wifth = width + 'px';
+    de.firstChild.style.width = width + 'px';
     $(de).css('transform', 'rotate('+rad+'rad)');
   };
 
@@ -355,7 +355,7 @@ p.refreshMesh = function () {
   this.mesh.geometry.normalsNeedUpdate = true;
 
   this.render();
-  this._fitHandlers();
+  this.fitHandlers();
 };
 
 p._vertexTo2d = (function() {
@@ -438,7 +438,7 @@ p._getTargetPositions = function (movingCorners) {
 
 p.getCornerList = function () {
 
-  return this.cornerList.slice().map(function (corner) {return corner.slice();});
+  return this._cornerList.slice().map(function (corner) {return corner.slice();});
 };
 
 module.exports = EdiBox;
@@ -490,8 +490,8 @@ function createEdgeHandlerLine() {
 
   var cont = document.createElement('div');
   cont.style.position = 'absolute';
-  cont.style.width = '6px';
-  cont.style.height = '6px';
+  cont.style.width = '0px';
+  cont.style.height = '0px';
   cont.style.backgroundColor = 'green';
   var line = document.createElement('div');
   cont.appendChild(line);
