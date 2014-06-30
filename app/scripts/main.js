@@ -13,7 +13,7 @@ var pager = require('./pager.js'),
 
 domReady(function () {
 
-    pager.open('gamepage');
+    pager.open('menu');
 
     $('nav #menu').click(pager.open.bind(null, 'menu'));
 
