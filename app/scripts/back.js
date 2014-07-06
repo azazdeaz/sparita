@@ -8,7 +8,7 @@ var back = {
     register: function (username, password, email) {
 
         return $.post(apiUrl + 'register', {
-                username: _username,
+                username: username,
                 password: password,
                 email: email
             })
@@ -18,7 +18,7 @@ var back = {
             .fail(errorHandler);
     },
 
-    login: function () {
+    login: function (username, password) {
 
         return $.post(apiUrl + 'login', {
                 username: username,
@@ -37,11 +37,11 @@ var back = {
 
     },
 
-    saveModel: function (model) {
+    saveModel: function () {
 
     },
 
-    getModelList: function (cb) {
+    getModelList: function () {
 
     },
 
@@ -61,4 +61,4 @@ function errorHandler (jqXhr) {
     }
 }
 
-module.exports = page;
+module.exports = back;

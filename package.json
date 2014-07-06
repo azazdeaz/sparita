@@ -2,7 +2,7 @@
   "name": "sparita",
   "version": "0.0.0",
   "devDependencies": {
-    "brfs": "^1.1.1",
+    "brfs": "^1.1.2",
     "browserify": "~3.29.0",
     "browserify-shim": "~3.2.2",
     "debowerify": "~0.5.2",
@@ -23,7 +23,11 @@
     "gulp-util": "~2.2.14",
     "jshint-stylish": "~0.1.5",
     "mocha": "~1.17.1",
-    "should": "~3.1.2"
+    "should": "~3.1.2",
+    "stringify": "^2.2.0",
+    "through": "^2.3.4",
+    "vinyl-source-stream": "^0.1.1",
+    "watchify": "^0.10.2"
   },
   "engines": {
     "node": ">=0.10.0"

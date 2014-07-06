@@ -1,13 +1,42 @@
-'use strict';
+// 'use strict';
 
-var fs = require('fs'),
-	prevCube = require('./prevCube');
+var prevCube = require('./prevCube'),
+    pager = require('./pager'),
+	template = require('../templates/design.html');
 
 
 var design = {
-	$root: $(fs.readFileSync('app/templates/design.html', 'utf8'))
+	$root: $(template)
 };
 
-design.$root.prepend(prevCube.domElement);
+function init() {
+
+    design.$root.find('.preview').append(prevCube.domElement);
+
+    design.$root.find('input').change(function () {
+
+    });
+
+    design.$root.find('.button.start').click(function () {
+
+        pager.open('gamepage', {
+            mode: 'editor',
+            div: {
+                x: design.$root.find('input.div-x').val(),
+                y: design.$root.find('input.div-y').val(),
+                z: design.$root.find('input.div-z').val()
+            }, 
+            boxDiv: {
+                x: design.$root.find('input.box-div-x').val(),
+                y: design.$root.find('input.box-div-y').val(),
+                z: design.$root.find('input.box-div-z').val()
+            },
+            name: design.$root.find('input.name').val(),
+            description: design.$root.find('input.description').val()
+        });
+    });
+}
+
+init();
 
 module.exports = design;

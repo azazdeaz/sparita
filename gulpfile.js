@@ -2,6 +2,12 @@
 // Generated on 2014-05-10 using generator-browserify 0.2.2
 
 var gulp = require('gulp');
+var gutil = require('gulp-util');
+var source = require('vinyl-source-stream');
+var watchify = require('watchify');
+var browserify = require('browserify');
+var stringify = require('stringify');
+
 var bower = 'app/bower_components';
 
 // Load plugins
@@ -51,38 +57,87 @@ gulp.task('vendor', function () {
 });
 
 // Scripts
-gulp.task('scripts', function () {
-  return gulp.src('app/scripts/main.js')
-    .pipe($.browserify({
-      debug: true,
-      transform: [
-        'browserify-shim',
-        'brfs', 
-        // 'debowerify'
-      ],
-      // shim: {
-      //     jquery: {
-      //       path: 'app/bower_components/jquery/dist/jquery.js',
-      //       exports: $
-      //     },
-      //     foundation: {
-      //       path: 'app/bower_components/foundation/js/foundation.js',
-      //       exports: null,
-      //       depends: {
-      //           jquery: 'jQuery',
-      //       }
-      //     }
-      // },
-      // Note: At this time it seems that you will also have to
-      // setup browserify-shims in package.json to correctly handle
-      // the exclusion of vendor vendor libraries from your bundle
-      // external: ['lodash', 'jQuery', 'foundation'],
-      extensions: ['.js']
-    }))
-    // .pipe($.uglify())
-    .pipe(gulp.dest('dist/scripts'))
-    .pipe($.size())
-    .pipe($.connect.reload());
+// gulp.task('_scripts', function () {
+
+//   var transform = ['browserify-shim'];
+
+//   if (!gulp.env.nobrfs) {
+//     transform.push('brfs');
+//   }
+
+
+
+//   return gulp.src('app/scripts/main.js')
+//     .pipe($.browserify({
+//       debug: true,
+//       transform: transform,
+//       // shim: {
+//       //     jquery: {
+//       //       path: 'app/bower_components/jquery/dist/jquery.js',
+//       //       exports: $
+//       //     },
+//       //     foundation: {
+//       //       path: 'app/bower_components/foundation/js/foundation.js',
+//       //       exports: null,
+//       //       depends: {
+//       //           jquery: 'jQuery',
+//       //       }
+//       //     }
+//       // }, 
+//       // Note: At this time it seems that you will also have to
+//       // setup browserify-shims in package.json to correctly handle
+//       // the exclusion of vendor vendor libraries from your bundle
+//       // external: ['lodash', 'jQuery', 'foundation'],
+//       extensions: ['.js']
+//     }))
+//     // .pipe($.uglify())
+//     .pipe(gulp.dest('dist/scripts'))
+//     .pipe($.size())
+//     .pipe($.connect.reload());
+// });
+
+gulp.task('scripts', function() {
+  var bundler = watchify('./app/scripts/main.js', {debug: true});
+
+  // if (!gulp.env.nobrfs) {
+  //   bundler.transform('brfs');
+  // }
+
+  bundler.transform(stringify(['.html']))
+
+  // bundler.add('./app/scripts/main.js');
+
+  bundler.on('change', function (list) {
+    console.log('<watchify>', list)
+    // $.connect.reload();
+  });
+
+  // bundler.transform(function (file) {
+  //   var data = '';
+  //   return through(write, end);
+
+  //   function write (buf) { data += buf }
+  //   function end () {
+  //       this.queue(coffee.compile(data));
+  //       this.queue(null);
+  //   }
+  // });
+
+  bundler.on('update', rebundle)
+
+  function rebundle () {
+    console.log('<watchify-rebundle>')
+    return bundler.bundle()
+      // log errors if they happen
+      .on('error', function(e) {
+        gutil.log('Browserify Error', e);
+      })
+      .pipe(source('main.js'))
+      .pipe(gulp.dest('./dist/scripts'))
+      .pipe($.connect.reload());
+  }
+
+  return rebundle()
 });
 
 // HTML
@@ -143,15 +198,6 @@ gulp.task('connect', $.connect.server({
   },
 }));
 
-gulp.task('connect-testerest', $.connect.server({
-  root: __dirname + '/testerest',
-  port: 9001,
-  open: {
-    file: 'index.html',
-    browser: 'Google Chrome'
-  },
-}));
-
 
 
 // Watch
@@ -160,15 +206,16 @@ gulp.task('watch', ['connect'], function () {
     gulp.watch([
         'app/scss/**/*.scss',
         'app/scripts/**/*.js',
-        'app/images/**/*'
-    ], $.connect.reload);
+        'app/images/**/*',
+        'app/templates/**/*.html'
+      ], $.connect.reload);
 
     // Watch .scss files
     gulp.watch('app/scss/**/*.scss', ['styles']);
 
 
-    // Watch .js files
-    gulp.watch(['app/templates/**/*.html', 'app/scripts/**/*.js'], ['scripts']);
+    // Watch .js and template files
+    // gulp.watch(['app/templates/**/*.html', 'app/scripts/**/*.js'], ['scripts']);
 
     // Watch image files
     gulp.watch('app/images/**/*', ['images']);

@@ -18,7 +18,6 @@ var VIEW_ANGLE = 45,
 
 // get the DOM element to attach to
 // - assume we've got jQuery to hand
-var $container = $('#container');
 
 // create a WebGL renderer, camera
 // and a scene
@@ -78,7 +77,7 @@ function getTexture(cubesX, cubesY, divX, divY) {
     }
   }
 
-  document.body.appendChild(bitmap)
+  // document.body.appendChild(bitmap);
   return bitmap;
 
   function line(sx, sy, ex, ey, lineWidth) {
@@ -138,7 +137,7 @@ scene.add(cube);
 
 // draw!
 renderer.render(scene, camera);
-window.render = function () {renderer.render(scene, camera);}
+window.render = function () {renderer.render(scene, camera);};
 window.cube = cube;
 
 function animSpin () {
@@ -171,4 +170,4 @@ module.exports = {
 	domElement: renderer.domElement,
 	startSpin: startSpin,
 	stopSpin: stopSpin
-}
+};

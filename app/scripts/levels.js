@@ -1,11 +1,10 @@
 'use strict';
 
-var fs = require('fs'),
-	$ = require('jquery');
+var template = require('../templates/levels.html');
 
 
 var levels = {
-	$root: $(fs.readFileSync('app/templates/levels.html', 'utf8'))
+	$root: $(template)
 };
 
 module.exports = levels;

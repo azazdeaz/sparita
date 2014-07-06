@@ -1,11 +1,11 @@
 'use strict';
 
-var fs = require('fs'),
-	$ = require('jquery'),
-	pager = require('./pager');
+
+var pager = require('./pager'),
+	template = require('../templates/menu.html');
 
 var menu = {
-	$root: $(fs.readFileSync('app/templates/menu.html', 'utf8'))
+	$root: $(template)
 };
 
 menu.$root.find('#btn-levels').click(function () {

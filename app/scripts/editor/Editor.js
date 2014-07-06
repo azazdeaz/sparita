@@ -16,6 +16,12 @@ function Editor(model) {
 
   this._renderW = 400;
   this._renderH = 300;
+  
+  this.domElement = document.createElement('div');
+
+  this.handlerLayer = document.createElement('div');
+  this.handlerLayer.style.position = 'relative';
+  this.domElement.appendChild(this.handlerLayer);
 
   this.initModel = model;
 
@@ -28,7 +34,7 @@ function Editor(model) {
 
   this.renderer = renderer = new THREE.WebGLRenderer({alpha: false});
   renderer.setSize(this._renderW, this._renderH);
-  this.domElement = renderer.domElement;
+  this.domElement.appendChild(renderer.domElement);
   
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.addEventListener('change', function () {
@@ -63,7 +69,8 @@ function Editor(model) {
           renderer: renderer,
           camera: camera,
           render: this.render.bind(this),
-          recordHistory: this.recordHistory.bind(this)
+          recordHistory: this.recordHistory.bind(this),
+          handlerLayer: this.handlerLayer
         });
         ediBox.position = {x: x, y: y, z: z};
         this.scene.add(ediBox.mesh);
@@ -106,6 +113,7 @@ function Editor(model) {
     }
   });
 
+  this.setSize(this._renderW, this._renderH);
   this.render();
   window.render = this.render.bind(this);
 
@@ -117,7 +125,7 @@ function Editor(model) {
       $('body').append(img);
       console.log(img.get(0));
     }, 0);
-  }
+  };
 }
 
 var p = Editor.prototype;
@@ -130,6 +138,10 @@ p.setSize = function(w, h) {
 
   this._renderW = w;
   this._renderH = h;
+
+  this.domElement.style.width = this._renderW + 'px';
+  this.domElement.style.height = this._renderH + 'px';
+
   this.camera.aspect = this._renderW / this._renderH;
   this.camera.updateProjectionMatrix();
 
@@ -166,7 +178,6 @@ p.getModel = function () {
 
 p._getEdiboxByPosition = function (pos) {
 
-  var ret;
   return this.ediBoxes.find(function (ediBox) {
 
     if (ediBox.position.x === pos.x ||
@@ -176,7 +187,7 @@ p._getEdiboxByPosition = function (pos) {
       return true;
     }
   });
-}
+};
 
 
 

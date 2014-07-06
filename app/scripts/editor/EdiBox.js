@@ -2,6 +2,8 @@
 
 function EdiBox(opt) {
 
+  this._opt = opt;
+
   this._div = opt.div;
   this._size = opt.size;
   this.renderer = opt.renderer;
@@ -68,7 +70,7 @@ function EdiBox(opt) {
   // geometry = new THREE.BoxGeometry(20, 20, 20);
   var material = new THREE.MeshLambertMaterial({wireframe: false,color: 0x0000FF});
   // var material = new THREE.MeshBasicMaterial({wireframe: true,color: 'blue'});
-  material.side = THREE.DoubleSide
+  material.side = THREE.DoubleSide;
 
   this.mesh = new THREE.Mesh(geometry, material);
 
@@ -141,7 +143,7 @@ p.createCornerHandler = function(corner) {
 
     handler.fit();
     de.style.visibility = 'visible';
-    that.renderer.domElement.parentNode.appendChild(de);
+    that._opt.handlerLayer.appendChild(de);
   };
 
   handler.hide = function() {
@@ -155,6 +157,7 @@ p.createCornerHandler = function(corner) {
   handler.fit = function () {
 
     var pos = that._vertexTo2d(that._cornerToVertex(corner));
+    
     de.style.left = pos[0] + 'px';
     de.style.top = pos[1] + 'px';
   };
@@ -180,7 +183,7 @@ p.createEdgeHandler = function(cornerA, cornerB) {
 
     handler.fit();
     de.style.visibility = 'visible';
-    that.renderer.domElement.parentNode.appendChild(de);
+    that._opt.handlerLayer.appendChild(de);
   };
 
   handler.hide = function() {
@@ -259,7 +262,7 @@ p.selectHandler = function (handler, mdx, mdy, onFinish) {
     deMarker.style.position = 'absolute';
     deMarker.style.backgroundColor = '#82f';
     $(deMarker).addClass('greenMarker gm'+idx);
-    document.body.appendChild(deMarker);
+    that._opt.handlerLayer.appendChild(deMarker);
   }, this);
 
   window.addEventListener('mousemove', movePicker);
