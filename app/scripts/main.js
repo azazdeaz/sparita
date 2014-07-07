@@ -8,14 +8,14 @@
 'use strict';
 
 var pager = require('./pager.js'),
-	domReady = require('domready');
+    domReady = require('domready'),
+	navbar = require('navbar');
 
 domReady(function () {
 
+    $(document)
+        .prepend(navbar.$root)
+        .foundation();
+
     pager.open('menu');
-
-    $('nav #menu').click(pager.open.bind(pager, 'menu'));
-    $('nav .register').click(pager.openModal.bind(pager, 'sign'));
-
-    $(document).foundation();
 });

@@ -1,9 +1,13 @@
 'use strict';
 
+var EventEmitter = require('event').EventEmitter;
+
 var apiUrl = 'boiling-earth-5474.herokuapp.com/';
 
 
-var back = {
+var back = new EventEmitter.call({
+
+    onLoginCbList = [],
 
     register: function (username, password, email) {
 
@@ -12,9 +16,7 @@ var back = {
                 password: password,
                 email: email
             })
-            .done(function () {
-                back._username = username;
-            })
+            .done(loginHandler)
             .fail(errorHandler);
     },
 
@@ -24,17 +26,15 @@ var back = {
                 username: username,
                 password: password
             })
+            .done(loginHandler)
             .fail(errorHandler);
     },
 
     logout: function () {
 
         return $.post(apiUrl + 'logout')
+            .done(logoutHandler)
             .fail(errorHandler);
-    },
-
-    refreshSession: function () {
-
     },
 
     saveModel: function () {
@@ -48,7 +48,7 @@ var back = {
     getModel: function () {
 
     }
-};
+});
 
 function errorHandler (jqXhr) {
 
@@ -59,6 +59,22 @@ function errorHandler (jqXhr) {
             back.onNeedLogin();
         }
     }
+}
+
+function loginHandler (res) {
+
+    back._user = res;
+    back.username = res.username;
+
+    back.emit('login');
+}
+
+function logoutHandler (res) {
+
+    back._user = undefined;
+    back.username = undefined;
+
+    back.emit('logout');
 }
 
 module.exports = back;
