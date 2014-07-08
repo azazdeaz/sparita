@@ -19,18 +19,20 @@ function init() {
 
         modelOpt = {
             mode: 'editor',
-            div: {
-                x: design.$root.find('input.div-x').val(),
-                y: design.$root.find('input.div-y').val(),
-                z: design.$root.find('input.div-z').val()
-            },
-            boxDiv: {
-                x: design.$root.find('input.box-div-x').val(),
-                y: design.$root.find('input.box-div-y').val(),
-                z: design.$root.find('input.box-div-z').val()
-            },
-            name: design.$root.find('input.name').val(),
-            description: design.$root.find('input.description').val()
+            model: {
+                div: {
+                    x: design.$root.find('input.div-x').val(),
+                    y: design.$root.find('input.div-y').val(),
+                    z: design.$root.find('input.div-z').val()
+                },
+                boxDiv: {
+                    x: design.$root.find('input.box-div-x').val(),
+                    y: design.$root.find('input.box-div-y').val(),
+                    z: design.$root.find('input.box-div-z').val()
+                },
+                name: design.$root.find('input.name').val(),
+                description: design.$root.find('input.description').val()
+            }
         }
 
         prevCube.refres(modelOpt);

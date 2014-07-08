@@ -7,6 +7,7 @@
     "lodash": ">=2.4.1",
     "threejs": "*",
     "threex-controls": "*",
-    "velocity": "^0.2.1"
+    "velocity": "^0.2.1",
+    "foundation-icon-fonts": "zurb/foundation-icon-fonts"
   }
 }

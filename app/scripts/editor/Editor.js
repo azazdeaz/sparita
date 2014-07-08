@@ -1,7 +1,7 @@
 'use strict';
 
 var EdiBox = require('./EdiBox'),
-  calcBlueprint = require('./calcBlueprint');
+  blueprint = require('./blueprint');
 
 function Editor(model) {
 
@@ -12,18 +12,18 @@ function Editor(model) {
     projector, raycaster,
     currEdiBox;
 
+  this.initModel = model;
+
   this.ediBoxes = [];
 
   this._renderW = 400;
   this._renderH = 300;
-  
+
   this.domElement = document.createElement('div');
 
   this.handlerLayer = document.createElement('div');
   this.handlerLayer.style.position = 'relative';
   this.domElement.appendChild(this.handlerLayer);
-
-  this.initModel = model;
 
   this.scene = scene = new THREE.Scene({antialias: true});
 
@@ -31,11 +31,10 @@ function Editor(model) {
   camera.position.z = 300;
   this.scene.add(camera);
 
-
   this.renderer = renderer = new THREE.WebGLRenderer({alpha: false});
   renderer.setSize(this._renderW, this._renderH);
   this.domElement.appendChild(renderer.domElement);
-  
+
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.addEventListener('change', function () {
 
@@ -120,8 +119,8 @@ function Editor(model) {
   window.blueprint = function () {
     setTimeout(function () {
       var model = that.getModel();
-      var bp = calcBlueprint(model);
-      var img = renderBlueprint(bp, 234, 234);
+      var bp = blueprint.generate(model);
+      var img = blueprint.render(bp, 234, 234);
       $('body').append(img);
       console.log(img.get(0));
     }, 0);
@@ -157,13 +156,13 @@ p.getModel = function () {
   for (var x = 0; x < this.initModel.div.x; ++x) {
 
     model.geometry.push([]);
-    
+
     for (var y = 0; y < this.initModel.div.y; ++y) {
-    
+
       model.geometry[x].push([]);
 
       for (var z = 0; z < this.initModel.div.z; ++z) {
-        
+
         var ediBox = this._getEdiboxByPosition({x: x, y: y, z: z});
         model.geometry[x][y].push(ediBox.getCornerList());
       }
@@ -191,7 +190,10 @@ p._getEdiboxByPosition = function (pos) {
 
 
 
-//history
+/////////////////////////////////////////////////////////////
+//history////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
 p.undo = function () {
 
   if (this._historyPointer > 0) {
@@ -232,97 +234,6 @@ p.recordHistory = function (reg) {
   this._history.push(reg);
   this._historyPointer = this._history.length;
 };
-
-
-
-function renderBlueprint(wire, w, h) {
-
-  var c = document.createElement('canvas'),
-    ctx = c.getContext('2d'),
-    m = 8,
-    sx = (w - 2*m) / wire.divX,
-    sy = (h - 2*m) / wire.divY;
-
-  c.width = w;
-  c.height = h;
-
-  // ctx.fillStyle = 'rgba(0, 0, 0, .23)';
-  // ctx.fillRect(0, 0, w, h);
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 3;
-  ctx.shadowBlur = m;
-  ctx.shadowColor = '#000';
-  ctx.translate(m, m);
-
-  wire.continuous.forEach(function (l) {
-
-    ctx.moveTo(k(l[0]*sx), k(l[1]*sy));
-    ctx.lineTo(k(l[2]*sx), k(l[3]*sy));
-  });
-
-  //debug, delMe
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.lineWidth = 6;
-
-  wire.dashed.forEach(function (l) {
-
-    var dx = (l[2] - l[0]) * sx,
-      dy = (l[3] - l[1]) * sy,
-      d = Math.abs(Math.sqrt(dx*dx + dy*dy)),
-      steps = Math.round(d / 23) * 2 + 1,
-      stepX = dx / steps,
-      stepY = dy / steps,
-      startX = l[0] * sx,
-      startY = l[1] * sy;
-
-    for (var i = 0; i <= steps; ++i) {
-
-      if(i % 2 === 0) {
-          ctx.moveTo(startX + stepX * i, startY + stepY * i);
-      } else {
-          ctx.lineTo(startX + stepX * i, startY + stepY * i);
-      }
-    }
-  });
-
-  function k(lp) {
-      return (parseInt(lp) + 0.5);
-  }
-
-  ctx.stroke();
-
-  var $name = $('<div>')
-    .css({
-      position: 'absolute',
-      fontFamily: 'Arvo, serif',
-      fontWeight: 700,
-      fontSize: '32px',
-      color: '#fff',
-      textAlign: 'center',
-      opacity: 0,
-      left: 15,
-      top: 12,
-      // backgroundColor: 'rgba(0, 0, 0, .43)'
-    })
-    .text(wire.name)
-    .addClass('name');
-
-  var $cont = $('<div>')
-    .css({
-      position: 'absolute',
-      width: w,
-      height: h
-    })
-    .addClass('wire')
-    .append(c, $name);
-
-  $cont.width = w;
-  $cont.height = h;
-
-  return $cont;
-}
-
 
 
 module.exports = Editor;
