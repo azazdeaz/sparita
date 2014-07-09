@@ -5,7 +5,7 @@ var template = require('../templates/navbar.html'),
     back = require('./back');
 
 var navbar = {
-    $root = $(template);
+    $root: $(template)
 }
 
 navbar.$root.find('.brand').click(pager.open.bind(pager, 'menu'));

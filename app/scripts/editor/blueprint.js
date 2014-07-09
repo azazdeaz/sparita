@@ -1,6 +1,6 @@
 var blueprint = module.exports = {};
 
-blueprint.generate(model, side, name) {
+blueprint.generate = function(model, side, name) {
 
   // return {"name":"front","divX":3,"divY":3,"continuous":[[0,0,0,3],[0,3,3,3],[3,3,3,0],[3,0,0,0],[0,1,3,1]],"dashed":[]};
 

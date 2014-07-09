@@ -1,10 +1,10 @@
-// 'use strict';
+'use strict';
 
 var prevCube = require('./prevCube'),
     pager = require('./pager'),
 	template = require('../templates/design.html');
 
-var modelOpt,
+var modelOpt;
 
 
 var design = {

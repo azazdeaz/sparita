@@ -35,6 +35,7 @@ gulp.task('vendor', function () {
       bower + '/threejs/build/three.js',
       bower + '/threex-controls/controls/OrbitControls.js',
       bower + '/jquery/dist/jquery.js',
+      bower + '/modernizr/modernizr.js',
       bower + '/foundation/js/foundation.js',
       bower + '/velocity/jquery.velocity.js'
     ])
@@ -83,7 +84,7 @@ gulp.task('vendor', function () {
 //       //           jquery: 'jQuery',
 //       //       }
 //       //     }
-//       // }, 
+//       // },
 //       // Note: At this time it seems that you will also have to
 //       // setup browserify-shims in package.json to correctly handle
 //       // the exclusion of vendor vendor libraries from your bundle

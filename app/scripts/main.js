@@ -9,13 +9,12 @@
 
 var pager = require('./pager.js'),
     domReady = require('domready'),
-	navbar = require('navbar');
+	navbar = require('./navbar');
 
 domReady(function () {
 
-    $(document)
-        .prepend(navbar.$root)
-        .foundation();
+    $('body').prepend(navbar.$root);
+    $(document).foundation();
 
     pager.open('menu');
 });

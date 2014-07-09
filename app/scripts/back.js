@@ -1,13 +1,13 @@
 'use strict';
 
-var EventEmitter = require('event').EventEmitter;
+var EventEmitter = require('events').EventEmitter;
 
 var apiUrl = 'boiling-earth-5474.herokuapp.com/';
 
 
-var back = new EventEmitter.call({
+var back = new EventEmitter();
 
-    onLoginCbList = [],
+_.extend(back, {
 
     register: function (username, password, email) {
 
