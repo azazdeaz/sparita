@@ -762,15 +762,7 @@ blueprint.generate = function(model, side, name) {
                             bPart = line2d(bLine.partList[ib], direction);
 
 
-                            if ((aPart[0] === bPart[0] &&
-                                 aPart[1] === bPart[1] &&
-                                 aPart[2] === bPart[2] &&
-                                 aPart[3] === bPart[3])
-                                ||
-                                (aPart[0] === bPart[2] &&
-                                 aPart[1] === bPart[3] &&
-                                 aPart[2] === bPart[0] &&
-                                 aPart[3] === bPart[1]))
+                            if (matching2dLines(aPart, bPart))
                             {
                                 // glog.line3d([[4,0,0],[4.3,-.2,0]], '#2bff42', 3, 0)
                                 // glog.line3d([[4.3,-.2,0],[4.8,.3,0]], '#2bff42', 3, 0)
@@ -1014,6 +1006,46 @@ blueprint.render = function(wire, w, h) {
 
 
 
+blueprint.match = function (bp0, bp1) {
+
+    var clone0 = cloneBp(bp0),
+        clone1 = cloneBp(bp1);
+
+    removeMatchings(clone0.continuous, clone1.continuous);
+    removeMatchings(clone0.dashed, clone1.dashed);
+
+    return (clone0.dashed.length === 0 && clone1.dashed.length === 0 &&
+        clone0.continuous.length === 0 && clone1.continuous.length === 0);
+
+
+
+    function removeMatchings(a, b) {
+
+        for (var ia = 0; ia < a.length; ++ia) {
+
+            for (var ib = 0; ib < b.length; ++ib) {
+
+                if (matching2dLines(a[ia], b[ib])) {
+                    a.splice(ia, 1);
+                    a.splice(ib, 1);
+                }
+            }
+        };
+    }
+
+
+    function cloneBp (bp) {
+
+        return {
+            continuous: bp.continuous.split().map(function (a) {return a.split()}),
+            dashed: bp.dashed.split().map(function (a) {return a.split()})
+        }
+    }
+}
+
+
+
+
 
 
 blueprint.print = function (opt) {
@@ -1032,7 +1064,254 @@ blueprint.print = function (opt) {
 
 
 
+blueprint.transformModel = function(m, way) {
+    var that = this, tm = {geometry: []}, oBlock, tBlock, x, y, z, cList;
 
+    switch (way) {
+
+        case 'x':
+            tm.div = {
+                x: m.div.x,
+                y: m.div.z,
+                z: m.div.y
+            }
+            tm.blockDiv = {
+                x: m.boxDiv.x,
+                y: m.boxDiv.z,
+                z: m.boxDiv.y
+            }
+        break;
+
+        case 'y':
+            tm.div = {
+                x: m.div.z,
+                y: m.div.y,
+                z: m.div.x
+            }
+            tm.blockDiv = {
+                x: m.boxDiv.z,
+                y: m.boxDiv.y,
+                z: m.boxDiv.x
+            }
+        break;
+
+        case 'z':
+            tm.div = {
+                x: m.div.y,
+                y: m.div.x,
+                z: m.div.z
+            }
+            tm.blockDiv = {
+                x: m.boxDiv.y,
+                y: m.boxDiv.x,
+                z: m.boxDiv.z
+            }
+        break;
+    }
+
+    for (x = 0; x < tm.div.x; ++x) {
+
+        tm.geometry.push([]);
+
+        for (y = 0; y < tm.div.y; ++y) {
+
+            tm.geometry[x].push([]);
+
+            for (z = 0; z < tm.div.z; ++z) {
+
+                tm.geometry[x][y].push([[], [], [], [], [], [], [], []]);
+            }
+        }
+    }
+
+    for (x = 0; x < m.div.x; ++x) {
+
+        for (y = 0; y < m.div.y; ++y) {
+
+            for (z = 0; z < m.div.z; ++z) {
+
+                oBlock = m.geometry[x][y][z];
+
+                switch (way) {
+
+                    case 'x':
+                    tBlock = tm.geometry[x][z][(tm.div.z-1) - y];
+                    copy(tBlock[0], oBlock[4]);
+                    copy(tBlock[4], oBlock[7]);
+                    copy(tBlock[7], oBlock[3]);
+                    copy(tBlock[3], oBlock[0]);
+                    copy(tBlock[1], oBlock[5]);
+                    copy(tBlock[5], oBlock[6]);
+                    copy(tBlock[6], oBlock[2]);
+                    copy(tBlock[2], oBlock[1]);
+                    break;
+
+                    case 'y':
+                    tBlock = tm[(tm.div.x-1) - z][y][x];
+                    copy(tBlock[0], oBlock[3]);
+                    copy(tBlock[1], oBlock[0]);
+                    copy(tBlock[2], oBlock[1]);
+                    copy(tBlock[3], oBlock[2]);
+                    copy(tBlock[4], oBlock[7]);
+                    copy(tBlock[5], oBlock[4]);
+                    copy(tBlock[6], oBlock[5]);
+                    copy(tBlock[7], oBlock[6]);
+                    break;
+
+                    case 'z':
+                    tBlock = tm[y][(tm.div.y-1) - x][z];
+                    copy(tBlock[0], oBlock[3]);
+                    copy(tBlock[1], oBlock[0]);
+                    copy(tBlock[2], oBlock[1]);
+                    copy(tBlock[3], oBlock[2]);
+                    copy(tBlock[4], oBlock[7]);
+                    copy(tBlock[5], oBlock[4]);
+                    copy(tBlock[6], oBlock[5]);
+                    copy(tBlock[7], oBlock[6]);
+                    break;
+                }
+            }
+        }
+    }
+
+    return tm;
+
+    function copy(target, source) {
+
+        switch (way) {
+
+            case 'x':
+            target[0] = source[0];
+            target[1] = source[2];
+            target[2] = m.boxDiv.z - source[1];
+            break;
+
+            case 'y':
+            target[0] = m.boxDiv.x - source[2];
+            target[1] = source[1];
+            target[2] = source[0];
+            break;
+
+            case 'z':
+            target[0] = source[1];
+            target[1] = m.boxDiv.y - source[0];
+            target[2] = source[2];
+            break;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+blueprint.testSolusion = function (mTest, mReference) {
+
+    var referenceBlueprints = getBlueprints(mReference);
+
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+
+    mTest = this._transformModel(mTest, 'y');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+
+    mTest = this._transformModel(mTest, 'y');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+
+    mTest = this._transformModel(mTest, 'y');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+
+    mTest = this._transformModel(mTest, 'x');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+
+    mTest = this._transformModel(mTest, 'x');
+    mTest = this._transformModel(mTest, 'x');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+    mTest = this._transformModel(mTest, 'z');
+    if (test(mTest, mReference)) return true;
+
+    return false;
+
+    function test(mT, mR) {
+
+        if (mT.div.x !== mR.div.x ||
+            mT.div.y !== mR.div.y ||
+            mT.div.z !== mR.div.z ||
+            mT.boxDiv.x !== mR.boxDiv.x ||
+            mT.boxDiv.y !== mR.boxDiv.y ||
+            mT.boxDiv.z !== mR.boxDiv.z)
+        {
+            return false;
+        }
+
+        var testBlueprints = getBlueprints(mS);
+
+        for (var i = 0; i < testBlueprints.length; ++i) {
+
+            if (!blueprint.match(testBlueprints[i], referenceBlueprints[i])) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    getBlueprints = function (model) {
+
+        var ret = [];
+
+        model.blueprintSides.forEach(function (side) {
+
+            ret.push(blueprint.generate(model, side));
+        });
+
+        return ret;
+    }
+}
 
 
 
@@ -1049,6 +1328,19 @@ blueprint.print = function (opt) {
 function mv(v0, v1) { //matchingVertexes
 
     return v0[0] === v1[0] && v0[1] === v1[1] && v0[2] === v1[2];
+}
+
+function matching2dLines(lineA, lineB) {
+
+    return (lineA[0] === lineB[0] &&
+            lineA[1] === lineB[1] &&
+            lineA[2] === lineB[2] &&
+            lineA[3] === lineB[3])
+           ||
+           (lineA[0] === lineB[2] &&
+            lineA[1] === lineB[3] &&
+            lineA[2] === lineB[0] &&
+            lineA[3] === lineB[1]);
 }
 
 function isPointsInTheSamePlane (p0, p1, p2, p3) {

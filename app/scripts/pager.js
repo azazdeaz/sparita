@@ -9,7 +9,8 @@ var $pageCont = $('#page-cont'),
 		'gamepage': function () { return require('./gamepage.js'); }
 	},
 	modals = {
-		'sign': function () { return require('./modals/sign.js'); }
+        'sign': function () { return require('./modals/sign.js'); },
+		'modelSettings': function () { return require('./modals/modelSettings.js'); }
 	};
 
 module.exports = {
@@ -27,8 +28,8 @@ module.exports = {
 		$(document).foundation();
 	},
 
-	openModal: function (name) {
+	openModal: function (name, opt) {
 
-		modals[name]().open();
+	   return modals[name]().open(opt);
 	}
 };

@@ -98,37 +98,15 @@ gulp.task('vendor', function () {
 // });
 
 gulp.task('scripts', function() {
-  var bundler = watchify('./app/scripts/main.js', {debug: true});
-
-  // if (!gulp.env.nobrfs) {
-  //   bundler.transform('brfs');
-  // }
+  var bundler = watchify('./app/scripts/main.js');
 
   bundler.transform(stringify(['.html']))
-
-  // bundler.add('./app/scripts/main.js');
-
-  bundler.on('change', function (list) {
-    console.log('<watchify>', list)
-    // $.connect.reload();
-  });
-
-  // bundler.transform(function (file) {
-  //   var data = '';
-  //   return through(write, end);
-
-  //   function write (buf) { data += buf }
-  //   function end () {
-  //       this.queue(coffee.compile(data));
-  //       this.queue(null);
-  //   }
-  // });
 
   bundler.on('update', rebundle)
 
   function rebundle () {
     console.log('<watchify-rebundle>')
-    return bundler.bundle()
+    return bundler.bundle({debug: true})
       // log errors if they happen
       .on('error', function(e) {
         gutil.log('Browserify Error', e);
