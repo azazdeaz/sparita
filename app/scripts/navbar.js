@@ -9,7 +9,8 @@ var navbar = {
 }
 
 navbar.$root.find('.brand').click(pager.open.bind(pager, 'menu'));
-navbar.$root.find('.register').click(pager.openModal.bind(pager, 'sign'));
+navbar.$root.find('.register').click(pager.openModal.bind(pager, 'sign', {tab: 'register'}));
+navbar.$root.find('.login').click(pager.openModal.bind(pager, 'sign', {tab: 'login'}));
 
 back.on('login', function () {
 

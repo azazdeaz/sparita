@@ -2,7 +2,8 @@
 
 var EventEmitter = require('events').EventEmitter;
 
-var apiUrl = 'boiling-earth-5474.herokuapp.com/';
+var apiUrl = 'http://localhost:3000/';
+// var apiUrl = 'boiling-earth-5474.herokuapp.com/';
 
 
 var back = new EventEmitter();

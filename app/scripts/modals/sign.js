@@ -9,11 +9,14 @@ var sign = {
 
 	$root: $(template),
 
-	open: function () {
+	open: function (opt) {
+
+        opt = opt || {};
 
         this.init();
-        // this.$root.foundation('reveal', 'open');
         this.$root.foundation().foundation('reveal', 'open');
+
+        this.selectTab(opt.tab || 'register');
     },
 
     init: function () {
@@ -25,7 +28,7 @@ var sign = {
 
         var that = this;
 
-		$('body').append(sign.$root);
+        $('body').append(sign.$root);
 
         this.$root.find('.tab-title.register').click(this.selectTab.bind(this, 'register'));
         this.$root.find('.tab-title.login').click(this.selectTab.bind(this, 'login'));
@@ -45,7 +48,22 @@ var sign = {
                     that.$root.foundation().foundation('reveal', 'close');
                 })
                 .fail(function () {
-                    
+
+                });
+        });
+
+        this.$root.find('.content.login .send').click(function () {
+
+            var $cont = that.$root.find('.content.login'),
+                username = $cont.find('input.username').val(),
+                password = $cont.find('input.password').val();
+
+            back.login(username)
+                .done(function () {
+                    that.$root.foundation().foundation('reveal', 'close');
+                })
+                .fail(function () {
+
                 });
         });
     },
