@@ -28,6 +28,11 @@ gulp.task('styles', function () {
     .pipe($.connect.reload());
 });
 
+gulp.task('icon-fonts', function () {
+  return gulp.src(bower + '/foundation-icon-fonts/**/*.*')
+    .pipe(gulp.dest('dist/styles/foundation-icon-fonts'))
+});
+
 // Vendor
 gulp.task('vendor', function () {
   return gulp.src([
@@ -105,7 +110,6 @@ gulp.task('scripts', function() {
   bundler.on('update', rebundle)
 
   function rebundle () {
-    console.log('<watchify-rebundle>')
     return bundler.bundle({debug: true})
       // log errors if they happen
       .on('error', function(e) {
@@ -153,11 +157,11 @@ gulp.task('clean', function () {
 
 // Build
 
-gulp.task('build', ['html', 'styles', 'scripts', 'images']);
+gulp.task('build', ['html', 'styles', 'icon-fonts', 'scripts', 'vendor', 'images']);
 
 // Dev Server
 
-gulp.task('dev', ['html', 'styles', 'scripts', 'images', 'connect', 'watch']);
+gulp.task('dev', ['html', 'styles', 'icon-fonts', 'scripts', 'images', 'connect', 'watch']);
 
 // Default task
 gulp.task('default', ['clean', 'vendor'], function () {

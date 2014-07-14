@@ -1048,7 +1048,7 @@ blueprint.match = function (bp0, bp1) {
 
 
 
-blueprint.print = function (opt) {
+blueprint.print = function (opt) {//opt:{model, side, name, width}
 
     _.extend(opt, {
         width: 300,

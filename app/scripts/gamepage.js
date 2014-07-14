@@ -30,11 +30,22 @@ var gamepage = {
     },
 };
 
-gamepage.$root.find('.btn-test').click(testSolusion);
-gamepage.$root.find('.btn-settings').click(function () {
+function init () {
 
-    pager.openModal('modelSettings');
-});
+    gamepage.$root.find('.btn-test').click(testSolusion);
+
+    gamepage.$root.find('.btn-settings').click(function () {
+
+        pager.openModal('modelSettings');
+    });
+
+    modelSettings.on('change-blueprint-sides', function (sides) {
+
+        editor.getOriginModel().blueprintSides = sides;
+
+        refreshBlueprints();
+    });
+}
 
 function testSolusion() {
 
@@ -44,7 +55,6 @@ function testSolusion() {
 
         handleWin();
     }
-
 }
 
 function handleWin() {
@@ -52,5 +62,21 @@ function handleWin() {
     pager.openModal('win');
 }
 
+function refreshBlueprints() {
 
+    var model = gamepage.editor.getModel(gamepage._setupOpt);
+
+    model.blueprintSides.forEach(function (sideName) {
+
+        var bp = blueprint.print({
+            model: model,
+            side: side,
+            name: side.chareAt(0).toUpperCase + side.substr(1)
+        });
+    });
+    
+}
+
+
+init();
 module.exports = gamepage;

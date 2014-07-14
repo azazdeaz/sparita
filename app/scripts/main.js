@@ -9,7 +9,7 @@
 
 var pager = require('./pager.js'),
     domReady = require('domready'),
-	navbar = require('./navbar');
+    navbar = require('./navbar');
 
 domReady(function () {
 
