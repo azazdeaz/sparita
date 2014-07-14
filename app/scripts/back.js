@@ -38,12 +38,16 @@ _.extend(back, {
             .fail(errorHandler);
     },
 
-    saveModel: function () {
+    saveModel: function (model) {
 
+      return $.post(apiUrl + 'savemodel', model)
+        .fail(errorHandler);
     },
 
     getModelList: function () {
 
+      return $.get(apiUrl + 'modelList')
+        .fail(errorHandler);
     },
 
     getModel: function () {

@@ -241,5 +241,10 @@ p.recordHistory = function (reg) {
   this._historyPointer = this._history.length;
 };
 
+p.reset = function () {
+
+  while(this.undo()){}
+};
+
 
 module.exports = Editor;

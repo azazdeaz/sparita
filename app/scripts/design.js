@@ -2,13 +2,46 @@
 
 var prevCube = require('./prevCube'),
     pager = require('./pager'),
+    back = require('./back'),
 	template = require('../templates/design.html');
 
 var modelOpt;
 
 
 var design = {
-	$root: $(template)
+	$root: $(template),
+
+    setup: function () {
+
+        back.getModelList().done(function (modelList) {
+
+            var myModels = _.where(modelList, {author: back.username}),
+                $list = this.$root.find('.saved-model-list').empty();
+
+            myModels.forEach(function (modelData) {
+
+                $('<li class="button expand"></li>')
+                    .text(modelData.model.name)
+                    .css({ marginBottom: 0 })
+                    .click(function () {
+                        modelOpt = modelData.model;
+                        prevCube.refres(modelOpt);
+                    })
+                    .appendTo($list);
+            });
+        })
+    },
+
+    selectTab: function (tabClass) {
+
+        var $tabContent = this.$root.find('.tabs-content');
+
+        $tabContent.children().hide();
+        $tabContent.find('.tab-content-'+tabClass).show();
+
+        this.$root.find('.tab-title').removeClass('active');
+        this.$root.find('.tab-title.'+tabClass).addClass('active');
+    }
 };
 
 function init() {
@@ -18,7 +51,6 @@ function init() {
     design.$root.find('input').change(function () {
 
         modelOpt = {
-            mode: 'editor',
             model: {
                 div: {
                     x: design.$root.find('input.div-x').val(),
@@ -35,12 +67,15 @@ function init() {
             }
         }
 
+        this.$root.find('.tab-title-new').click(this.selectTab.bind(this, 'new'));
+        this.$root.find('.tab-title-open').click(this.selectTab.bind(this, 'open'));
+
         prevCube.refres(modelOpt);
     });
 
     design.$root.find('.button.start').click(function () {
 
-        pager.open('gamepage', modelOpt);
+        pager.open('gamepage', _.extend({mode: 'editor'}, modelOpt));
     });
 }
 
