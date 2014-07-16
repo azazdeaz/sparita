@@ -15,13 +15,15 @@ var page = {
 
             modelList.forEach(function (modelData) {
 
+                var model = modelDat.src;
+
                 $('<li class="button expand"></li>')
-                    .text(modelData.model.name)
+                    .text(model.name)
                     .css({ marginBottom: 0 })
                     .click(function () {
                         pager.open('gamepage', {
-                            mode: 'play',
-                            initModel: modelData.model,
+                            mode: 'game',
+                            initModel: model,
                         })
                     })
                     .appendTo($list);

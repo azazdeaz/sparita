@@ -32,7 +32,8 @@ var gamepage = {
         gamepage.editor.setSize(window.innerWidth, window.innerHeight);
         gamepage.$root.append(gamepage.editor.domElement);
 
-        this.$root.find('.param-settings')[opt.mode === 'editor' ? 'show' : 'hide']();
+        this.$root.find('.btn-settings .btn-save')[opt.mode === 'editor' ? 'show' : 'hide']();
+        this.$root.find('.btn-finish')[opt.mode === 'game' ? 'show' : 'hide']();
 
         this.$navbarAddon.find('.btn-undo')(function () {gamepage.editor.undo();});
         this.$navbarAddon.find('.btn-redo')(function () {gamepage.editor.redo();});
