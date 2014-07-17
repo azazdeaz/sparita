@@ -30,12 +30,6 @@ var sign = {
 
         $('body').append(sign.$root);
 
-        this.$root.find('.tab-title.register').click(this.selectTab.bind(this, 'register'));
-        this.$root.find('.tab-title.login').click(this.selectTab.bind(this, 'login'));
-
-        this.selectTab('register');
-
-
         this.$root.find('.content.register .send').click(function () {
 
             var $cont = that.$root.find('.content.register'),
@@ -66,17 +60,6 @@ var sign = {
 
                 });
         });
-    },
-
-    selectTab: function (tabClass) {
-
-        var $tabContent = this.$root.find('.tabs-content');
-
-        $tabContent.children().hide();
-        $tabContent.find('.content.'+tabClass).show();
-
-        this.$root.find('.tab-title').removeClass('active');
-        this.$root.find('.tab-title.'+tabClass).addClass('active');
     }
 };
 

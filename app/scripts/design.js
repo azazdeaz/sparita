@@ -30,17 +30,6 @@ var design = {
                     .appendTo($list);
             });
         })
-    },
-
-    selectTab: function (tabClass) {
-
-        var $tabContent = this.$root.find('.tabs-content');
-
-        $tabContent.children().hide();
-        $tabContent.find('.tab-content-'+tabClass).show();
-
-        this.$root.find('.tab-title').removeClass('active');
-        this.$root.find('.tab-title.'+tabClass).addClass('active');
     }
 };
 
@@ -66,9 +55,6 @@ function init() {
                 description: design.$root.find('input.description').val()
             }
         }
-
-        this.$root.find('.tab-title-new').click(this.selectTab.bind(this, 'new'));
-        this.$root.find('.tab-title-open').click(this.selectTab.bind(this, 'open'));
 
         prevCube.refres(modelOpt);
     });
