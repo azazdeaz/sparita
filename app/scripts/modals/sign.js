@@ -58,7 +58,7 @@ var sign = {
                 username = $cont.find('input.username').val(),
                 password = $cont.find('input.password').val();
 
-            back.login(username)
+            back.login(username, password)
                 .done(function () {
                     that.$root.foundation().foundation('reveal', 'close');
                 })

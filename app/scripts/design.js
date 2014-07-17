@@ -16,7 +16,7 @@ var design = {
         back.getModelList().done(function (modelList) {
 
             var myModels = _.where(modelList, {author: back.username}),
-                $list = this.$root.find('.saved-model-list').empty();
+                $list = design.$root.find('.saved-model-list').empty();
 
             myModels.forEach(function (modelData) {
 
