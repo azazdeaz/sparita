@@ -60,6 +60,10 @@ var sign = {
 
                 });
         });
+    },
+    selectTab: function (tab) {
+
+        this.$root.find('[href="#sign-tab-'+tab+'"]').click();
     }
 };
 

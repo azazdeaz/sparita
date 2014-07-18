@@ -30,6 +30,10 @@ var design = {
                     .appendTo($list);
             });
         })
+    },
+    selectTab: function (tab) {
+
+        this.$root.find('[href="#design-tab-'+tab+'"]').click();
     }
 };
 
