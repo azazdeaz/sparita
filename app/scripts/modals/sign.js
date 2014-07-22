@@ -30,31 +30,33 @@ var sign = {
 
         $('body').append(sign.$root);
 
-        this.$root.find('.content.register .send').click(function () {
+        this.$root.find('#sign-tab-register ._send').click(function () {
 
-            var $cont = that.$root.find('.content.register'),
-                email = $cont.find('input.email').val(),
-                username = $cont.find('input.username').val(),
-                password = $cont.find('input.password').val();
+            var $cont = that.$root.find('#sign-tab-register'),
+                email = $cont.find('._email').val(),
+                username = $cont.find('._username').val(),
+                password = $cont.find('._password').val();
 
             back.register(username, password, email)
                 .done(function () {
                     that.$root.foundation().foundation('reveal', 'close');
+                    that.clearFields();
                 })
                 .fail(function () {
 
                 });
         });
 
-        this.$root.find('.content.login .send').click(function () {
+        this.$root.find('#sign-tab-login ._send').click(function () {
 
-            var $cont = that.$root.find('.content.login'),
-                username = $cont.find('input.username').val(),
-                password = $cont.find('input.password').val();
+            var $cont = that.$root.find('#sign-tab-login'),
+                username = $cont.find('._username').val(),
+                password = $cont.find('._password').val();
 
             back.login(username, password)
                 .done(function () {
                     that.$root.foundation().foundation('reveal', 'close');
+                    that.clearFields();
                 })
                 .fail(function () {
 
@@ -64,6 +66,11 @@ var sign = {
     selectTab: function (tab) {
 
         this.$root.find('[href="#sign-tab-'+tab+'"]').click();
+    },
+
+    clearFields: function () {
+
+        this.$root.find('input').val('')
     }
 };
 

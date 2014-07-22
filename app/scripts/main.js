@@ -9,6 +9,7 @@
 
 var pager = require('./pager.js'),
     domReady = require('domready'),
+    back = require('./back'),
     navbar = require('./navbar');
 
 domReady(function () {
@@ -17,4 +18,6 @@ domReady(function () {
     $(document).foundation();
 
     pager.open('menu');
+
+    back.testSession();
 });

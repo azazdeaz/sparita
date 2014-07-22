@@ -7,7 +7,7 @@ var template = require('../../templates/modals/modelSettings.html'),
 
 var modal =  new EventEmitter();
 
-_.extened(modal, {
+_.assign(modal, {
 
     $root: $(template),
 
@@ -57,7 +57,7 @@ _.extened(modal, {
 
             if (this.checked) {
 
-                ret.push(this.getAttribure('data-side'));
+                ret.push(this.getAttribute('data-side'));
             }
         });
 
@@ -68,7 +68,7 @@ _.extened(modal, {
 
         this.$root.find('.bp-side').each(function () {
 
-            if (sides.indexOf(this.getAttribure('data-side')) !== -1) {
+            if (sides.indexOf(this.getAttribute('data-side')) !== -1) {
 
                 this.checked = true;
             }

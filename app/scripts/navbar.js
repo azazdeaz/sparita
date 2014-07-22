@@ -8,22 +8,23 @@ var navbar = {
     $root: $(template)
 }
 
-navbar.$root.find('.brand').click(pager.open.bind(pager, 'menu'));
-navbar.$root.find('.register').click(pager.openModal.bind(pager, 'sign', {tab: 'register'}));
-navbar.$root.find('.login').click(pager.openModal.bind(pager, 'sign', {tab: 'login'}));
+navbar.$root.find('._brand').click(pager.open.bind(pager, 'menu'));
+navbar.$root.find('._register').click(pager.openModal.bind(pager, 'sign', {tab: 'register'}));
+navbar.$root.find('._login').click(pager.openModal.bind(pager, 'sign', {tab: 'login'}));
+navbar.$root.find('._logout').click(back.logout.bind(back));
 
 back.on('login', function () {
 
-    navbar.$root.find('.register, .login').hide();
-    navbar.$root.find('.username').show().text(back.username);
-    navbar.$root.find('.logout').show();
+    navbar.$root.find('._sign').hide();
+    navbar.$root.find('._user').show();
+    navbar.$root.find('._username').text(back.username);
 });
 
 back.on('logout', function () {
 
-    navbar.$root.find('.register, .login').show();
-    navbar.$root.find('.username').hide().text('');
-    navbar.$root.find('.logout').hide();
+    navbar.$root.find('._sign').show();
+    navbar.$root.find('._user').hide();
+    navbar.$root.find('._username').text('');
 });
 
 module.exports = navbar;

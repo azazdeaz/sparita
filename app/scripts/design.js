@@ -63,9 +63,9 @@ function init() {
         prevCube.refres(modelOpt);
     });
 
-    design.$root.find('.button.start').click(function () {
+    design.$root.find('._start').click(function () {
 
-        pager.open('gamepage', _.extend({mode: 'editor'}, modelOpt));
+        pager.open('gamepage', {mode: 'editor', initModel: modelOpt});
     });
 }
 

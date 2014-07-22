@@ -7,6 +7,7 @@ var apiUrl = 'http://localhost:3000/';
 
 
 var back = new EventEmitter();
+window.back = back;//debug
 
 _.extend(back, {
 
@@ -36,6 +37,13 @@ _.extend(back, {
         return $.post(apiUrl + 'logout')
             .done(logoutHandler)
             .fail(errorHandler);
+    },
+
+    testSession: function () {
+
+        return $.post(apiUrl + 'session')
+            .done(loginHandler)
+            .fail(logoutHandler);
     },
 
     saveModel: function (model) {
