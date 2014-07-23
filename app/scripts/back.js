@@ -9,6 +9,13 @@ var apiUrl = 'http://localhost:3000/';
 var back = new EventEmitter();
 window.back = back;//debug
 
+$.ajaxSetup({
+    crossDomain: true,
+    xhrFields: {
+        withCredentials: true
+    }
+});
+
 _.extend(back, {
 
     register: function (username, password, email) {
