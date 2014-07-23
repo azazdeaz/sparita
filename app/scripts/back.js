@@ -55,7 +55,7 @@ _.extend(back, {
 
     saveModel: function (model) {
 
-      return $.post(apiUrl + 'savemodel', model)
+      return $.post(apiUrl + 'savemodel', {model: model})
         .fail(errorHandler);
     },
 

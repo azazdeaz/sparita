@@ -174,6 +174,7 @@ p.getModel = function () {
     }
   }
 
+  model.name = this.initModel.name;
   model.div = _.clone(this.initModel.div);
   model.boxDiv = _.clone(this.initModel.boxDiv);
   model.blueprintSides = _.clone(this.initModel.blueprintSides);
