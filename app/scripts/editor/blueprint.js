@@ -22,9 +22,11 @@ blueprint.generate = function(model, side, name) {
             [4, 5], [5, 6], [6, 7], [7, 4]
         ];
 
+    model = blueprint.transformModelToSide(model, side);
     oMap = model.geometry;
     oMap.div = model.div;
     oMap.boxDiv = model.boxDiv;
+
 
     ret = {
         name: name || 'test',
@@ -975,12 +977,12 @@ blueprint.render = function(wire, w, h) {
   var $name = $('<div>')
     .css({
       position: 'absolute',
-      fontFamily: 'Arvo, serif',
+      fontFamily: '"Helvetica Neue", Helvetica, Helvetica, Arial, sans-serif',
       fontWeight: 700,
       fontSize: '32px',
       color: '#fff',
       textAlign: 'center',
-      opacity: 0,
+      opacity: 1,
       left: 15,
       top: 12,
       // backgroundColor: 'rgba(0, 0, 0, .43)'
@@ -990,7 +992,7 @@ blueprint.render = function(wire, w, h) {
 
   var $cont = $('<div>')
     .css({
-      position: 'absolute',
+      position: 'relative',
       width: w,
       height: h
     })
@@ -1000,7 +1002,7 @@ blueprint.render = function(wire, w, h) {
   $cont.width = w;
   $cont.height = h;
 
-  return $cont;
+  return $cont.get(0);
 }
 
 
@@ -1056,13 +1058,39 @@ blueprint.print = function (opt) {//opt:{model, side, name, width}
     });
 
     var bp = blueprint.generate(opt.model, opt.side, opt.name),
-        sx = opt.width / bp;
+        sx = opt.width / bp.divX,
+        sy = opt.height / bp.divY,
+        rw, rh;
 
-    return blueprint.render(bp, w, h)
+    if (sx < sy) {
+        rw = opt.width;
+        rh = bp.divY * sx;
+    }
+    else {
+        rw = bp.divX * sy;
+        rh = opt.height;
+    }
+
+    return blueprint.render(bp, rw, rh);
 }
 
 
+blueprint.transformModelToSide = function (m, side) {
 
+    var ways;
+
+    switch (side) {
+
+        case 'top': ways = ['x']; break;
+        case 'bottom': ways = ['x', 'x', 'x']; break;
+        case 'right': ways = ['y']; break;
+        case 'left': ways = ['y', 'y', 'y']; break;
+        case 'back': ways = ['x', 'x']; break;
+        case 'front': default: ways = [];
+    }
+
+    return ways.reduce(blueprint.transformModel, m);
+}
 
 blueprint.transformModel = function(m, way) {
     var that = this, tm = {geometry: []}, oBlock, tBlock, x, y, z, cList;
@@ -1075,7 +1103,7 @@ blueprint.transformModel = function(m, way) {
                 y: m.div.z,
                 z: m.div.y
             }
-            tm.blockDiv = {
+            tm.boxDiv = {
                 x: m.boxDiv.x,
                 y: m.boxDiv.z,
                 z: m.boxDiv.y
@@ -1088,7 +1116,7 @@ blueprint.transformModel = function(m, way) {
                 y: m.div.y,
                 z: m.div.x
             }
-            tm.blockDiv = {
+            tm.boxDiv = {
                 x: m.boxDiv.z,
                 y: m.boxDiv.y,
                 z: m.boxDiv.x
@@ -1101,7 +1129,7 @@ blueprint.transformModel = function(m, way) {
                 y: m.div.x,
                 z: m.div.z
             }
-            tm.blockDiv = {
+            tm.boxDiv = {
                 x: m.boxDiv.y,
                 y: m.boxDiv.x,
                 z: m.boxDiv.z
@@ -1147,7 +1175,7 @@ blueprint.transformModel = function(m, way) {
                     break;
 
                     case 'y':
-                    tBlock = tm[(tm.div.x-1) - z][y][x];
+                    tBlock = tm.geometry[(tm.div.x-1) - z][y][x];
                     copy(tBlock[0], oBlock[3]);
                     copy(tBlock[1], oBlock[0]);
                     copy(tBlock[2], oBlock[1]);
@@ -1159,7 +1187,7 @@ blueprint.transformModel = function(m, way) {
                     break;
 
                     case 'z':
-                    tBlock = tm[y][(tm.div.y-1) - x][z];
+                    tBlock = tm.geometry[y][(tm.div.y-1) - x][z];
                     copy(tBlock[0], oBlock[3]);
                     copy(tBlock[1], oBlock[0]);
                     copy(tBlock[2], oBlock[1]);

@@ -68,7 +68,8 @@ function EdiBox(opt) {
   geometry.computeVertexNormals();
 
   // geometry = new THREE.BoxGeometry(20, 20, 20);
-  var material = new THREE.MeshLambertMaterial({wireframe: false,color: 0x0000FF});
+  // var material = new THREE.MeshLambertMaterial({wireframe: false,color: 0x0000FF});
+  var material = new THREE.MeshNormalMaterial();
   // var material = new THREE.MeshBasicMaterial({wireframe: true,color: 'blue'});
   material.side = THREE.DoubleSide;
 
@@ -157,7 +158,7 @@ p.createCornerHandler = function(corner) {
   handler.fit = function () {
 
     var pos = that._vertexTo2d(that._cornerToVertex(corner));
-    
+
     de.style.left = pos[0] + 'px';
     de.style.top = pos[1] + 'px';
   };

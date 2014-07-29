@@ -35,6 +35,8 @@ var gamepage = {
         gamepage.editor.setSize(window.innerWidth, window.innerHeight);
         gamepage.$root.append(gamepage.editor.domElement);
 
+        refreshBlueprints();
+
         this.$root.find('._btn-settings ._btn-save')[opt.mode === 'editor' ? 'show' : 'hide']();
         this.$root.find('._btn-finish')[opt.mode === 'game' ? 'show' : 'hide']();
     }
@@ -58,7 +60,7 @@ function init () {
 
         gamepage.editor.getOriginModel().blueprintSides = sides;
 
-        refreshBlueprints();
+          refreshBlueprints();
     });
 
     gamepage.$navbarAddon.find('._btn-undo').click(function () {gamepage.editor.undo();});
@@ -97,7 +99,7 @@ function refreshBlueprints() {
         prints.push(blueprint.print({
             model: model,
             side: sideName,
-            name: sideName.chareAt(0).toUpperCase + sideName.substr(1)
+            name: sideName.charAt(0).toUpperCase() + sideName.substr(1)
         }));
     });
 

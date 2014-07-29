@@ -1,6 +1,6 @@
 'use strict';
 
-var template = require('../templates/challenge.html')
+var template = require('../templates/challenge.html'),
     pager = require('./pager');
 
 
@@ -15,7 +15,7 @@ var page = {
 
             modelList.forEach(function (modelData) {
 
-                var model = modelDat.src;
+                var model = modelData.model;
 
                 $('<li class="button expand"></li>')
                     .text(model.name)

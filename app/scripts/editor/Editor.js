@@ -48,14 +48,14 @@ function Editor(model) {
   projector = new THREE.Projector();
   raycaster = new THREE.Raycaster();
 
-  var pointLight = new THREE.PointLight(0xFFFFFF);
-  pointLight.position.x = 310;
-  pointLight.position.y = 250;
-  camera.add(pointLight);
-  pointLight = new THREE.PointLight(0xFFFFFF);
-  pointLight.position.x = -310;
-  pointLight.position.y = -250;
-  camera.add(pointLight);
+  // var pointLight = new THREE.PointLight(0xFFFFFF);
+  // pointLight.position.x = 310;
+  // pointLight.position.y = 250;
+  // camera.add(pointLight);
+  // pointLight = new THREE.PointLight(0xFFFFFF);
+  // pointLight.position.x = -310;
+  // pointLight.position.y = -250;
+  // camera.add(pointLight);
 
 
   for (x = 0; x < model.div.x; ++x) {
