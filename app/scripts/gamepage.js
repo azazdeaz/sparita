@@ -18,7 +18,7 @@ var gamepage = {
 
     setup: function (_opt) {
 
-        var opt = gamepage._setupOpt = _.merge({
+        var opt = gamepage._setupOpt = _.merge({}, _opt, {
             mode: 'editor',
             initModel: {
                 name: 'Unnamed model',
@@ -26,7 +26,7 @@ var gamepage = {
                 boxDiv: {x: 3, y: 3, z: 3},
                 blueprintSides: ['front', 'right']
             }
-        }, _opt);
+        });
 
         modelSettings.setName(opt.initModel.name);
         modelSettings.setBlueprintSides(opt.initModel.blueprintSides);

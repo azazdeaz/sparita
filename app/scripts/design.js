@@ -60,7 +60,7 @@ function init() {
             }
         }
 
-        prevCube.refres(modelOpt);
+        prevCube.refresh(modelOpt);
     });
 
     design.$root.find('._start').click(function () {

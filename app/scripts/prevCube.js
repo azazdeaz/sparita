@@ -54,10 +54,12 @@ function refreshCube() {
 
     cube.material = new THREE.MeshFaceMaterial(materials.concat(materials));
 
-    cube.setGeometry(THREE.BoxGeometry(
-        uSize * cubesX * divX,
-        uSize * cubesY * divY,
-        uSize * cubesZ * divZ), cubeMaterial);
+    cube.geometry = new THREE.BoxGeometry(
+        uSize * opt.div.x * opt.boxDiv.x,
+        uSize * opt.div.y * opt.boxDiv.y,
+        uSize * opt.div.z * opt.boxDiv.z);
+
+    cube.needsUpdate = true;
 }
 
 
