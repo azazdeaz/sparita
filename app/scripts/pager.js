@@ -1,6 +1,7 @@
 'use strict';
 
 var $pageCont = $('#page-cont'),
+    currPage,
 	pages = {
 		'menu': function () { return require('./menu.js'); },
 		'levels': function () { return require('./levels.js'); },
@@ -17,7 +18,15 @@ module.exports = {
 
 	open: function (pageId, opt) {
 
-		var page = pages[pageId]();
+        if (currPage) {
+
+            if (currPage.close) {
+
+                currPage.close();
+            }
+        }
+
+		var page = currPage = pages[pageId]();
 
 		$pageCont.children().hide();
 		$pageCont.append( page.$root.show() );

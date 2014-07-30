@@ -30,7 +30,7 @@ _.assign(modal, {
 
         this.$root.find('.bp-side').change(function () {
 
-            this.emit('change-blueprint-sides', this.getBlueprintSides());
+            modal.emit('change-blueprint-sides', modal.getBlueprintSides());
         });
     },
 
@@ -51,7 +51,7 @@ _.assign(modal, {
 
     getBlueprintSides: function () {
 
-        var ret;
+        var ret = [];
 
         this.$root.find('.bp-side').each(function () {
 

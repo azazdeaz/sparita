@@ -5,7 +5,12 @@ var template = require('../templates/navbar.html'),
     back = require('./back');
 
 var navbar = {
-    $root: $(template)
+    $root: $(template),
+
+    setDynamicContent: function (content) {
+
+        navbar.$root.find('._dynamic-cont').empty().append(content);
+    }
 }
 
 navbar.$root.find('._brand').click(pager.open.bind(pager, 'menu'));

@@ -4,6 +4,7 @@ var Editor = require('./editor/Editor'),
     blueprint = require('./editor/blueprint'),
     pager = require('./pager'),
     back = require('./back'),
+    navbar = require('./navbar'),
     modelSettings = require('./modals/modelSettings'),
     template = require('../templates/gamepage.html');
 
@@ -11,14 +12,14 @@ var gamepage = {
 
     $root: $(template),
     $navbarAddon: $(
-        '<li><a class="btn-undo">undo</a></li>' +
-        '<li><a class="btn-redo">redo</a></li>' +
-        '<li><a class="btn-reset">reset</a></li>'
+        '<li><a class="_btn-undo">undo</a></li>' +
+        '<li><a class="_btn-redo">redo</a></li>' +
+        '<li><a class="_btn-reset">reset</a></li>'
     ),
 
     setup: function (_opt) {
 
-        var opt = gamepage._setupOpt = _.merge({}, _opt, {
+        var opt = gamepage._setupOpt = _.merge({}, {
             mode: 'editor',
             initModel: {
                 name: 'Unnamed model',
@@ -26,7 +27,9 @@ var gamepage = {
                 boxDiv: {x: 3, y: 3, z: 3},
                 blueprintSides: ['front', 'right']
             }
-        });
+        }, _opt);
+
+        navbar.setDynamicContent(gamepage.$navbarAddon);
 
         modelSettings.setName(opt.initModel.name);
         modelSettings.setBlueprintSides(opt.initModel.blueprintSides);
@@ -39,6 +42,16 @@ var gamepage = {
 
         this.$root.find('._btn-settings ._btn-save')[opt.mode === 'editor' ? 'show' : 'hide']();
         this.$root.find('._btn-finish')[opt.mode === 'game' ? 'show' : 'hide']();
+    },
+
+    close: function () {
+
+        navbar.setDynamicContent('');
+
+        if (gamepage.editor) {
+
+            $(gamepage.editor.domElement).remove();
+        }
     }
 };
 

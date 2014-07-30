@@ -445,6 +445,10 @@ p.getCornerList = function () {
   return this._cornerList.slice().map(function (corner) {return corner.slice();});
 };
 
+p.destroy = function () {
+
+}
+
 module.exports = EdiBox;
 
 
