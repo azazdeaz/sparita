@@ -17,7 +17,10 @@ menu.$root.find('#btn-challenge').click(function () {
 });
 
 menu.$root.find('#btn-design').click(function () {
-	pager.open('design');
+    pager.open('design');
+});
+menu.$root.find('#btn-debug').click(function () {
+    pager.open('gamepage', {"mode":"editor","initModel":{"div":{"x":"2","y":"1","z":"2"},"boxDiv":{"x":"3","y":"3","z":"3"},"blueprintSides": ["front"], "name":"model-x"}});
 });
 
 module.exports = menu;

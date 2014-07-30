@@ -25,7 +25,7 @@ var design = {
                     .css({ marginBottom: 0 })
                     .click(function () {
                         modelOpt = modelData.model;
-                        prevCube.refres(modelOpt);
+                        prevCube.refresh(modelOpt);
                     })
                     .appendTo($list);
             });

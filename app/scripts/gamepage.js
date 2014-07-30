@@ -18,14 +18,14 @@ var gamepage = {
     ),
 
     setup: function (_opt) {
-
+// console.log(JSON.stringify(_opt));//debug
         var opt = gamepage._setupOpt = _.merge({}, {
             mode: 'editor',
             initModel: {
                 name: 'Unnamed model',
                 div: {x: 2, y: 3, z: 4},
                 boxDiv: {x: 3, y: 3, z: 3},
-                blueprintSides: ['front', 'right']
+                blueprintSides: []
             }
         }, _opt);
 

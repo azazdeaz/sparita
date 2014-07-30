@@ -204,7 +204,7 @@ blueprint.generate = function(model, side, name) {
                         }
                     });
                 });
-
+var sml = matches.length//debug
                 if (matches.length > 1) {//just for optimalisation
 
                     //merge matches on the same blocks
@@ -252,10 +252,13 @@ blueprint.generate = function(model, side, name) {
 
                     m = matches[0];
 
-                    // glog.line3d(m.lp, 'rgba(23, 45, 234, .43)', 1, m.block.pos);//debug
-                    // glog.line3d(m.oLineA, 'rgba(23, 245, 34, .43)', 1, m.block.pos);//debug
-                    // glog.line3d(m.oLineB, 'rgba(234, 45, 4, .43)', 1, m.block.pos);//debug
+                    if (sml> 1) {
 
+                        console.log(m)
+                        glog.line3d(m.lp, 'rgba(23, 45, 234, .43)', 1, m.block.pos);//debug
+                        glog.line3d(m.oLineA, 'rgba(23, 245, 34, .43)', 1, m.block.pos);//debug
+                        glog.line3d(m.oLineB, 'rgba(234, 45, 4, .43)', 1, m.block.pos);//debug
+                    }
                     if (isPointsInTheSamePlane(m.lp[0], m.oLineA[0], m.lp[1], m.oLineB[0]) ||
                         isPointsInTheSamePlane(m.lp[0], m.oLineA[0], m.lp[1], m.oLineB[1]) ||
                         isPointsInTheSamePlane(m.lp[0], m.oLineA[1], m.lp[1], m.oLineB[0]) ||
@@ -1579,12 +1582,16 @@ var glog = (function () {
     ctx.fillStyle = '#f41';
     ctx.fillRect(0,0,12,12);
 
-    $(c).css({
-            position: 'absolute',
+    $('<div>')
+        .css({
+            left: 0,
+            top: 0,
+            position: 'fixed',
             zIndex: '99999',
             pointerEvents: 'none'
         })
-        // .appendTo('body');
+        .append(c)
+        .appendTo('body');
 
     var glog = {
 
