@@ -38,7 +38,7 @@ var gamepage = {
         if (opt.mode === 'editor') {
 
             gamepage.editor.on('change', refreshBlueprints);
-            gamepage.editor.showGeometry(opt.initModel.showGeometry);
+            gamepage.editor.showGeometry(opt.initModel.geometry);
 
             modelSettings.setName(opt.initModel.name);
             modelSettings.setBlueprintSides(opt.initModel.blueprintSides);
@@ -79,7 +79,7 @@ function init () {
 
         gamepage.editor.getOriginModel().blueprintSides = sides;
 
-          refreshBlueprints();
+        refreshBlueprints();
     });
 
     gamepage.$navbarAddon.find('._btn-undo').click(function () {gamepage.editor.undo();});
@@ -110,7 +110,7 @@ function handleWin() {
 
 function refreshBlueprints() {
 
-    var model = gamepage.editor.getModel(gamepage._setupOpt), prints = [], fullH,
+    var model = gamepage.editor.getModel(), prints = [], fullH,
         $blueprintCont = gamepage.$root.find('._blueprint-cont').empty();
 
     model.blueprintSides.forEach(function (sideName) {

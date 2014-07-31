@@ -161,11 +161,14 @@ p.setSize = function(w, h) {
 
 p.showGeometry = function (geometry) {
 
-    this.ediBoxes.forEach(function (ediBox) {
+    if (geometry) {
+        
+        this.ediBoxes.forEach(function (ediBox) {
 
-        var p = ediBox.position;
-        ediBox.setGeometry(geometry[p.x][p.y][p.z]);
-    });
+            var p = ediBox.position;
+            ediBox.setGeometry(geometry[p.x][p.y][p.z]);
+        });
+    }
 }
 
 p.getOriginModel = function () {

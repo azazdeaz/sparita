@@ -14,7 +14,7 @@ function EdiBox(opt) {
     this.renderer = opt.renderer;
     this.camera = opt.camera;
     this.render = opt.render;
-    this.recordHistory = opt.recordHistory;
+    this._recordHistory = opt.recordHistory;
 
     var geometry = new THREE.Geometry();
     geometry.dynamic = true;
@@ -347,7 +347,7 @@ p._moveCorners = function(corners, offset, noHistory) {
         });
     }
 
-    corners.forEach(function () {
+    corners.forEach(function (corner) {
 
         corner[0] += offset[0];
         corner[1] += offset[1];
@@ -356,7 +356,7 @@ p._moveCorners = function(corners, offset, noHistory) {
 
     this.refreshMesh();
 
-    that.emit('change');
+    this.emit('change');
 };
 
 p.setGeometry = function (geometry) {

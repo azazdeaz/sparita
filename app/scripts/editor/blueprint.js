@@ -1590,7 +1590,7 @@ var glog = (function () {
             pointerEvents: 'none'
         })
         .append(c)
-        .appendTo('body');
+        // .appendTo('body');
 
     var glog = {
 
