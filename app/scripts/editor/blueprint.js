@@ -99,7 +99,6 @@ blueprint.generate = function(model, side, name) {
                             line.partList.push(lp);
                         }
                     }
-
                 });
 
                 surfaceVidxList.forEach(function (vidxList, sidx) {
@@ -205,33 +204,31 @@ blueprint.generate = function(model, side, name) {
                     });
                 });
 var sml = matches.length//debug
-                if (matches.length > 1) {//just for optimalisation
 
-                    //merge matches on the same blocks
-                    for (var i = 0; i < matches.length; ++i) {
-                        for (var j = 0; j < matches.length; ++j) {
+                //merge matches on the same blocks
+                for (var i = 0; i < matches.length; ++i) {
+                    for (var j = 0; j < matches.length; ++j) {
 
-                            if (i === j) {
-                                continue;
+                        if (i === j) {
+                            continue;
+                        }
+
+                        if (matches[i].block === matches[j].block) {//on the same cube
+
+                            var im = matches[i],
+                                jm = matches.splice(j--, 1)[0];
+
+                            jm.clear();
+
+                            if (im.oLineA === jm.line) {
+
+                                im.oLineA = im.line === jm.oLineA ? jm.oLineB : jm.oLineA;
                             }
-
-                            if (matches[i].block === matches[j].block) {//on the same cube
-
-                                var im = matches[i],
-                                    jm = matches.splice(j--, 1)[0];
-
-                                jm.clear();
-
-                                if (im.oLineA === jm.line) {
-
-                                    im.oLineA = im.line === jm.oLineA ? jm.oLineB : jm.oLineA;
-                                }
-                                else if (im.oLineB === jm.line) {
-                                    im.oLineB = im.line === jm.oLineA ? jm.oLineB : jm.oLineA;
-                                }
-                                else {//debug
-                                    throw Error()//debug
-                                }
+                            else if (im.oLineB === jm.line) {
+                                im.oLineB = im.line === jm.oLineA ? jm.oLineB : jm.oLineA;
+                            }
+                            else {//debug
+                                throw Error()//debug
                             }
                         }
                     }
@@ -247,12 +244,12 @@ var sml = matches.length//debug
                         mergeMatches(matches[l], 'oLineB', matches);
                     }
                 }
-
+if (sml === 4) console.log('x', matches)
                 if (matches.length === 1) {
 
                     m = matches[0];
 
-                    if (sml> 1) {
+                    if (sml === 4) {
 
                         console.log(m)
                         glog.line3d(m.lp, 'rgba(23, 45, 234, .43)', 1, m.block.pos);//debug
@@ -305,9 +302,8 @@ var sml = matches.length//debug
                 commonSideIndex,
                 nextOLineName;
 
-            if (getNeighbour() &&
-                getNextOppositeLine())
-            {
+            if (getNeighbour()) {
+
                 neighbourMatch.clear();
                 matches.splice(matches.indexOf(neighbourMatch), 1);
 
@@ -338,7 +334,10 @@ var sml = matches.length//debug
                         neighbourMatch = m1;
                         commonSideIndex = neighbourSides.indexOf(1);
 
-                        return true;
+                        if (getNextOppositeLine()) {
+
+                            return true;
+                        }
                     }
                 }
             }

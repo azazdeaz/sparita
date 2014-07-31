@@ -17,7 +17,10 @@ domReady(function () {
     $('body').prepend(navbar.$root);
     $(document).foundation();
 
-    pager.open('menu');
+    // pager.open('menu');
+    pager.open('gamepage', {"mode":"editor","initModel":{"div":{"x":"2","y":"1","z":"2"},"boxDiv":{"x":"3","y":"3","z":"3"},"blueprintSides": ["front"], "name":"model-x"}});
+    $('body').css('opacity', 0);
+
 
     back.testSession();
 });
