@@ -31,12 +31,18 @@ var gamepage = {
 
         navbar.setDynamicContent(gamepage.$navbarAddon);
 
-        modelSettings.setName(opt.initModel.name);
-        modelSettings.setBlueprintSides(opt.initModel.blueprintSides);
-
         gamepage.editor = new Editor(opt.initModel);
         gamepage.editor.setSize(window.innerWidth, window.innerHeight);
         gamepage.$root.append(gamepage.editor.domElement);
+
+        if (opt.mode === 'editor') {
+
+            gamepage.editor.on('change', refreshBlueprints);
+            gamepage.editor.showGeometry(opt.initModel.showGeometry);
+
+            modelSettings.setName(opt.initModel.name);
+            modelSettings.setBlueprintSides(opt.initModel.blueprintSides);
+        }
 
         refreshBlueprints();
 

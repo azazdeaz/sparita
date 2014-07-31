@@ -1,9 +1,13 @@
 'use strict';
 
 var EdiBox = require('./EdiBox'),
+    inherits = require('inherits'),
+    events = require('events'),
     blueprint = require('./blueprint');
 
 function Editor(model) {
+
+    events.EventEmitter.call(this);
 
     var that = this,
         x, y, z,
@@ -81,6 +85,7 @@ function Editor(model) {
                 ediBox.mesh.position.z = (((model.div.z-1) / -2) + z) * boxSize.z;
                 ediBox.onChange = this.render.bind(this);
                 this.ediBoxes.push(ediBox);
+                ediBox.on('change', function () {that.emit('change')});
             }
         }
     }
@@ -130,6 +135,8 @@ function Editor(model) {
     };
 }
 
+inherits(Editor, events.EventEmitter);
+
 var p = Editor.prototype;
 
 p.render = function () {
@@ -151,6 +158,15 @@ p.setSize = function(w, h) {
 
     this.render();
 };
+
+p.showGeometry = function (geometry) {
+
+    this.ediBoxes.forEach(function (ediBox) {
+
+        var p = ediBox.position;
+        ediBox.setGeometry(geometry[p.x][p.y][p.z]);
+    });
+}
 
 p.getOriginModel = function () {
 
@@ -200,10 +216,12 @@ p._getEdiboxByPosition = function (pos) {
 
 p.destroy = function () {
 
-        p.ediBoxes.forEach(function (ediBox) {
+    p.ediBoxes.forEach(function (ediBox) {
 
-                ediBox.destroy();
-        });
+        ediBox.destroy();
+    });
+
+    this.removeAllListeners();
 }
 
 

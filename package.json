@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "domready": "^1.0.5",
-    "events": "^1.0.1"
+    "events": "^1.0.1",
+    "inherits": "^2.0.1"
   }
 }
